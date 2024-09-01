@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pingfen.user.repository.mapper.UserMapper">
+    <select id="getUser" resultType="com.pingfen.user.entry.User">
+        SELECT
+            user.id,
+            user.nick_name,
+            user.phone_number
+        FROM user
+        WHERE
+            1 = 1
+            <if test="id != null">
+                AND user.id = #{id}
+            </if>
+            <if test="phoneNumber != null">
+                AND user.phone_number = #{phoneNumber}
+            </if>
+            <if test="nickName != null">
+                AND user.nick_name = #{nickName}
+            </if>
+    </select>
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user (id, nick_name, phone_number, password)
+        VALUES (null,#{nickName},#{phoneNumber},#{password});
+    </insert>
+</mapper>
