@@ -9,4 +9,7 @@ public interface UserService {
     Result doLogin(UserDTO userDTO);
 
     Result addUser(UserDTO userDTO);
+
+    Result showProfile();
+
 }

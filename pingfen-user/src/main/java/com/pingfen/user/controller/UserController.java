@@ -29,7 +29,7 @@ public class UserController {
     }
 
     /**
-     * 用户登录
+     * 用户验证码登录
      * @param userDTO
      * @return
      */
@@ -47,5 +47,14 @@ public class UserController {
     @PostMapping("/addUser")
     public Result addUser(@RequestBody UserDTO userDTO){
         return userService.addUser(userDTO);
+    }
+
+    /**
+     * 查看个人资料
+     * @return
+     */
+    @GetMapping("/me")
+    public Result me(){
+        return userService.showProfile();
     }
 }

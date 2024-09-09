@@ -10,4 +10,6 @@ public interface UserMapper {
 
     List<User> getUser(User user);
     int insertUser(User user);
+
+    User getUserByPhoneNumber(String phoneNumber);
 }

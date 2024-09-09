@@ -21,6 +21,9 @@
                 AND user.nick_name = #{nickName}
             </if>
     </select>
+    <select id="getUserByPhoneNumber" resultType="com.pingfen.user.entry.User">
+        SELECT * FROM user WHERE phone_number = #{phoneNumber}
+    </select>
     <insert id="insertUser" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO user (id, nick_name, phone_number, password)
         VALUES (null,#{nickName},#{phoneNumber},#{password});

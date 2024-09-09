@@ -2,12 +2,14 @@ package com.pingfen.user.service;
 
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.pingfen.user.common.Constants;
 import com.pingfen.user.common.Result;
 import com.pingfen.user.dto.UserDTO;
 import com.pingfen.user.entry.User;
 import com.pingfen.user.repository.mapper.UserMapper;
+import com.pingfen.user.utils.UserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -42,30 +44,65 @@ public class UserServiceImpl implements UserService{
     }
 
     /**
-     * 用户验证码登录
+     * 用户验登录
      * @param userDTO
      * @return
      */
     @Override
     public Result doLogin(UserDTO userDTO) {
+        if(userDTO.getPassword() != null && !userDTO.getPassword().equals("")){
+            return doLoginByPassword(userDTO);
+        }else return doLoginByCode(userDTO);
+    }
+
+    /**
+     * 通过验证码注册或登录
+     * @param userDTO
+     * @return
+     */
+    private Result doLoginByCode(UserDTO userDTO) {
         String loginKey = Constants.VERIFICATION_CODE_PREFIX + userDTO.getPhoneNumber();
         String code = redisTemplate.opsForValue().get(loginKey);
         if(!userDTO.getCode().equals(code)){
             return Result.failWithMsg("验证码错误");
         }
-        User user = new User();
-        user.setPhoneNumber(userDTO.getPhoneNumber());
-        List<User> userList = userMapper.getUser(user);
-        if(userList == null || userList.isEmpty()){
+        User user = userMapper.getUserByPhoneNumber(userDTO.getPhoneNumber());
+        if(user == null){
+            //创建新用户设置初始值
+            user = new User();
             user.setPassword("123456");
             user.setNickName(RandomUtil.randomString(10));
             userMapper.insertUser(user);
-        }else user = userList.get(0);
+        }
+        return Result.ok(getUserToken(user));
+    }
+
+    /**
+     * 存储用户会话信息并返回token
+     * @param user
+     * @return
+     */
+    private String getUserToken(User user){
+        //TODO 逻辑优化防止相同用户生成不同token等
         String token = UUID.randomUUID().toString(true);
         String userSession = JSONUtil.toJsonPrettyStr(user);
         redisTemplate.opsForValue().set( Constants.USER_SESSION_PREFIX + token,userSession,1,TimeUnit.DAYS);
-        return Result.ok(token);
+        return token;
     }
+
+    /**
+     * 通过密码登录
+     * @param userDTO
+     * @return
+     */
+    private Result doLoginByPassword(UserDTO userDTO) {
+        User user = userMapper.getUserByPhoneNumber(userDTO.getPhoneNumber());
+        if(user == null) return Result.failWithMsg("账号或密码错误");
+        //TODO 密码明文加密
+        if(!userDTO.getPassword().equals(user.getPassword())) return Result.failWithMsg("账号或密码错误");
+        return Result.ok(getUserToken(user));
+    }
+
 
     /**
      * 添加用户
@@ -80,5 +117,15 @@ public class UserServiceImpl implements UserService{
         user.setPassword(userDTO.getPassword());
         int result = userMapper.insertUser(user);
         return result != 1?Result.failWithMsg("添加用户失败"):Result.ok();
+    }
+
+    /**
+     * 返回用户个人信息
+     * @return
+     */
+    @Override
+    public Result showProfile() {
+        //TODO 暂时先返回用户全部信息
+        return Result.ok(UserHolder.getUserSession());
     }
 }
