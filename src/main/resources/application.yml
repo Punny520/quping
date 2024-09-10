@@ -30,6 +30,7 @@ sa-token:
 server:
   port: 8080
 mybatis:
-  mapper-locations: classpath:dao/mapper/*.xml
+  # 指定Mapper.xml文件的路径,如果不指定,则需要和接口类路径相同
+  mapper-locations: classpath:mapper/*.xml
   configuration:
     map-underscore-to-camel-case: true
