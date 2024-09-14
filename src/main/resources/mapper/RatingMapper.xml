@@ -8,4 +8,9 @@
         INSERT INTO rating (id, image_url, score, title, text)
                     VALUES (null,#{imageUrl},#{score},#{title},#{text});
     </insert>
+    <select id="getById" resultType="com.quping.entry.Rating">
+        SELECT id,image_url,score,title,text
+        FROM rating
+        WHERE id = #{id};
+    </select>
 </mapper>

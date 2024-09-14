@@ -4,10 +4,7 @@ import com.quping.common.Result;
 import com.quping.dto.RatingDTO;
 import com.quping.service.RatingService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @description: 评分修改Controller
@@ -19,9 +16,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class RatingController {
     @Autowired
     private RatingService ratingService;
+
+    /**
+     * 插入评分
+     * @param ratingDTO
+     * @return
+     */
     @PostMapping
     public Result addRating(@RequestBody RatingDTO ratingDTO){
         //TODO 参数验证
         return ratingService.insert(ratingDTO);
+    }
+
+    /**
+     * 根据id获取评分
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public Result getRating(@PathVariable int id){
+        return ratingService.getById(id);
     }
 }

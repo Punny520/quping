@@ -25,6 +25,6 @@ public class MvcConfig implements WebMvcConfigurer {
                         "/getCode",
                         "/doLogin",
                         "/addUser",
-                        "/rating");
+                        "/rating/**");
     }
 }

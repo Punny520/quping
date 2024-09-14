@@ -16,4 +16,6 @@ public final class Constants {
      * 用户会话信息前缀
      */
     public static final String USER_SESSION_PREFIX = "quping:session:";
+
+    public static final String RATING_CACHE_PREFIX = "quping:rating:";
 }

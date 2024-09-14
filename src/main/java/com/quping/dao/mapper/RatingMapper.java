@@ -11,4 +11,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface RatingMapper {
     int insert(Rating rating);
+
+    Rating getById(int id);
 }

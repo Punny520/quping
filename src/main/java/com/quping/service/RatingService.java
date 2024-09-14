@@ -6,4 +6,7 @@ import com.quping.dto.RatingDTO;
 
 public interface RatingService {
     Result insert(RatingDTO ratingDTO);
+
+    Result getById(int id);
+
 }
