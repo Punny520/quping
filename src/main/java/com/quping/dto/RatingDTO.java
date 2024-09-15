@@ -33,4 +33,8 @@ public class RatingDTO {
      * 正文
      */
     private String text;
+    /**
+     * 评分人数
+     */
+    private int count;
 }

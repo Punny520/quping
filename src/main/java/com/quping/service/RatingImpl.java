@@ -69,16 +69,44 @@ public class RatingImpl implements RatingService{
      */
     @Override
     public Result doRating(UserRatingMappingDTO urmd) {
+        Rating rating = ratingMapper.getById(urmd.getRatingId());
+        if(rating == null){
+            return Result.fail();
+        }
         UserRatingMapping urm = new UserRatingMapping();
         BeanUtil.copyProperties(urmd,urm);
         UserRatingMapping entry = userRatingMapper.getByEntry(urm);
         int res = 0;
         if(entry == null){
-            res = userRatingMapper.insert(urm);
+            //新增用户评分
+            userRatingMapper.insert(urm);
+            /**
+             * talScore/count = oldScore => talScore = oldScore*count
+             * newScore = (talScore+newUScore)/(count+1) => (oldScore*count+newUScore)/(count+1)
+             */
+            float oldScore = rating.getScore();
+            float count = rating.getCount();
+            float newUScore = urm.getScore();
+            float newScore = (oldScore*count+newUScore)/(count+1);
+            rating.setScore(newScore);
+            rating.setCount(rating.getCount()+1);
         }else{
+            //用户修改评分
+            /**
+             * talScore/count = oldScore => talScore = oldScore*count
+             * newScore = (talScore - oldUScore + newUScore)/count =>
+             * newScore = (oldScore*count - oldUScore + newUScore)/count
+             */
+            float oldScore = rating.getScore();
+            float count = rating.getCount();
+            float oldUScore = entry.getScore();
+            float newUScore = urm.getScore();
+            float newScore = (oldScore*count-oldUScore+newUScore)/count;
+            rating.setScore(newScore);
             entry.setScore(urm.getScore());
-            res = userRatingMapper.update(entry);
+            userRatingMapper.update(entry);
         }
+        res = ratingMapper.update(rating);
         return res>0?Result.ok():Result.fail();
     }
 }

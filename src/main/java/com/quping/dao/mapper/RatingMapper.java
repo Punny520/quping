@@ -13,4 +13,6 @@ public interface RatingMapper {
     int insert(Rating rating);
 
     Rating getById(int id);
+
+    int update(Rating rating);
 }
