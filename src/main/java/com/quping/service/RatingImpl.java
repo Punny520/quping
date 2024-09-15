@@ -4,9 +4,12 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
 import com.quping.common.Constants;
 import com.quping.common.Result;
+import com.quping.dao.mapper.UserRatingMapper;
 import com.quping.dto.RatingDTO;
+import com.quping.dto.UserRatingMappingDTO;
 import com.quping.entry.Rating;
 import com.quping.dao.mapper.RatingMapper;
+import com.quping.entry.UserRatingMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,8 @@ import java.util.concurrent.TimeUnit;
 public class RatingImpl implements RatingService{
     @Autowired
     RatingMapper ratingMapper;
+    @Autowired
+    UserRatingMapper userRatingMapper;
     @Autowired
     StringRedisTemplate stringRedisTemplate;
     /**
@@ -55,5 +60,25 @@ public class RatingImpl implements RatingService{
             return ratingJSON.equals("") ? Result.fail() : Result.ok(rating);
         }
         return ratingJSON.equals("")?Result.fail():Result.ok(JSONUtil.toBean(ratingJSON,Rating.class));
+    }
+
+    /**
+     * 用户评分
+     * @param urmd
+     * @return
+     */
+    @Override
+    public Result doRating(UserRatingMappingDTO urmd) {
+        UserRatingMapping urm = new UserRatingMapping();
+        BeanUtil.copyProperties(urmd,urm);
+        UserRatingMapping entry = userRatingMapper.getByEntry(urm);
+        int res = 0;
+        if(entry == null){
+            res = userRatingMapper.insert(urm);
+        }else{
+            entry.setScore(urm.getScore());
+            res = userRatingMapper.update(entry);
+        }
+        return res>0?Result.ok():Result.fail();
     }
 }

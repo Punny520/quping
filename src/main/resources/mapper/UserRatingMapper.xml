@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quping.dao.mapper.UserRatingMapper">
+
+    <insert id="doRating">
+        INSERT INTO user_rating_mapping (user_id, rating_id, score)
+        VALUES (#{userId},#{ratingId},#{score})
+        ON DUPLICATE KEY UPDATE score
+    </insert>
+    <select id="getByEntry" resultType="com.quping.entry.UserRatingMapping">
+        SELECT id,user_id,rating_id,score
+        FROM user_rating_mapping
+        WHERE 1 = 1
+        <if test="id != null">
+            AND id = #{id}
+        </if>
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
+        <if test="ratingId != null">
+            AND rating_id = #{ratingId}
+        </if>
+        <if test="score != null">
+            AND score = #{score}
+        </if>
+    </select>
+</mapper>

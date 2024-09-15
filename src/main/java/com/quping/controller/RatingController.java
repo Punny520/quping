@@ -2,7 +2,9 @@ package com.quping.controller;
 
 import com.quping.common.Result;
 import com.quping.dto.RatingDTO;
+import com.quping.dto.UserRatingMappingDTO;
 import com.quping.service.RatingService;
+import com.quping.utils.UserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,5 +38,16 @@ public class RatingController {
     @GetMapping("/{id}")
     public Result getRating(@PathVariable int id){
         return ratingService.getById(id);
+    }
+
+    /**
+     * 用户评分
+     * @param urmd
+     * @return
+     */
+    @PostMapping("/doRating")
+    public Result doRating(@RequestBody UserRatingMappingDTO urmd){
+        urmd.setUserId(UserHolder.getUserSession().getId());
+        return ratingService.doRating(urmd);
     }
 }
