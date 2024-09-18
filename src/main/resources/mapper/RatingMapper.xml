@@ -12,6 +12,7 @@
         UPDATE rating
         <set>
             <if test="imageUrl!=null">image_url = #{imageUrl},</if>
+            <if test="score!=null">score = #{score},</if>
             <if test="title!=null">title = #{title},</if>
             <if test="text!=null">`text` = #{text},</if>
             <if test="count!=null">`count` = #{count},</if>

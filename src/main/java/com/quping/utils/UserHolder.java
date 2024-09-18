@@ -1,6 +1,7 @@
 package com.quping.utils;
 
 
+import cn.hutool.json.JSONUtil;
 import com.quping.entry.User;
 
 /**
@@ -15,6 +16,7 @@ public class UserHolder {
     }
 
     public static void saveUserSession(User user){
+        System.out.println("保存用户Session:\n"+ JSONUtil.toJsonPrettyStr(user));
         USER_HOLDER.set(user);
     }
 

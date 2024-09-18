@@ -16,7 +16,7 @@ public class RatingDTO {
     /**
      * id
      */
-    private int id;
+    private Integer id;
     /**
      * 图片链接
      */
@@ -24,7 +24,7 @@ public class RatingDTO {
     /**
      * 评分
      */
-    private float score;
+    private Float score;
     /**
      * 标题
      */
@@ -36,5 +36,5 @@ public class RatingDTO {
     /**
      * 评分人数
      */
-    private int count;
+    private Integer count;
 }

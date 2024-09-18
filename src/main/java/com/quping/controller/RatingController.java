@@ -3,6 +3,7 @@ package com.quping.controller;
 import com.quping.common.Result;
 import com.quping.dto.RatingDTO;
 import com.quping.dto.UserRatingMappingDTO;
+import com.quping.entry.User;
 import com.quping.service.RatingService;
 import com.quping.utils.UserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,8 @@ public class RatingController {
      */
     @PostMapping("/doRating")
     public Result doRating(@RequestBody UserRatingMappingDTO urmd){
-        urmd.setUserId(UserHolder.getUserSession().getId());
+        User user = UserHolder.getUserSession();
+        urmd.setUserId(user.getId());
         return ratingService.doRating(urmd);
     }
 }

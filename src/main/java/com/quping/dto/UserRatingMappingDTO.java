@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserRatingMappingDTO {
-    private int id;
-    private int userId;
-    private int ratingId;
-    private int score;
+    private Integer id;
+    private Integer userId;
+    private Integer ratingId;
+    private Integer score;
 }
