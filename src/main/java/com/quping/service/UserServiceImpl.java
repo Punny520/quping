@@ -30,15 +30,18 @@ public class UserServiceImpl implements UserService{
     UserMapper userMapper;
     /**
      * 获取登录验证码
+     *
      * @param phoneNumber
      */
     @Override
-    public void getCode(String phoneNumber) {
+    public String getCode(String phoneNumber) {
+        //TODO 验证码发送
         String code = RandomUtil.randomNumbers(6);
         log.info("验证码为：{} 5分钟内有效",code);
         //构造key存入Redis中设置5分钟过期
         String loginKey = Constants.VERIFICATION_CODE_PREFIX + phoneNumber;
         redisTemplate.opsForValue().set(loginKey,code,5, TimeUnit.MINUTES);
+        return code;
     }
 
     /**
@@ -70,6 +73,7 @@ public class UserServiceImpl implements UserService{
             user = new User();
             user.setPassword("123456");
             user.setNickName(RandomUtil.randomString(10));
+            user.setPhoneNumber(userDTO.getPhoneNumber());
             userMapper.insertUser(user);
         }
         return Result.ok(getUserToken(user));

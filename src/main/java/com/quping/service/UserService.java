@@ -5,7 +5,7 @@ import com.quping.common.Result;
 import com.quping.dto.UserDTO;
 
 public interface UserService {
-    void getCode(String phoneNumber);
+    String getCode(String phoneNumber);
 
     Result doLogin(UserDTO userDTO);
 
