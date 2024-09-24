@@ -24,6 +24,7 @@ public class MvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/getCode",
                         "/doLogin",
-                        "/test/**");
+                        "/test/**",
+                        "/rating/9");
     }
 }

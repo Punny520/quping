@@ -10,7 +10,7 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public class Result {
+public class Result<T> {
     /**
      * 状态码
      */
@@ -22,23 +22,23 @@ public class Result {
     /**
      * 数据
      */
-    private Object data;
-    public static Result ok(Object data){
-        return new Result("1","ok",data);
+    private T data;
+    public static <T> Result<T> ok(T data){
+        return new Result<>("1","ok",data);
     }
 
-    public static Result ok(){
-        return new Result("1","ok",null);
+    public static <T> Result<T> ok(){
+        return new Result<>("1","ok",null);
     }
 
-    public static Result fail(Object data){
-        return new Result("-1","fail",data);
+    public static <T> Result<T> fail(T data){
+        return new Result<>("-1","fail",data);
     }
 
-    public static Result fail(){
-        return new Result("-1","fail",null);
+    public static <T> Result<T> fail(){
+        return new Result<>("-1","fail",null);
     }
-    public static Result failWithMsg(String msg){
-        return new Result("-1",msg,null);
+    public static <T> Result<T> failWithMsg(String msg){
+        return new Result<>("-1",msg,null);
     }
 }

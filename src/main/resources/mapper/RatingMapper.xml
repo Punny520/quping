@@ -24,4 +24,16 @@
         FROM rating
         WHERE id = #{id};
     </select>
+    <select id="getByEntry" resultType="com.quping.entry.Rating">
+        SELECT id,image_url,score,title,`text`,`count`
+        FROM rating
+        <where>
+            <if test="id!=null">id = #{id}</if>
+            <if test="imageUrl!=null">image_url = #{imageUrl},</if>
+            <if test="score!=null">score = #{score},</if>
+            <if test="title!=null">title = #{title},</if>
+            <if test="text!=null">`text` = #{text},</if>
+            <if test="count!=null">`count` = #{count},</if>
+        </where>
+    </select>
 </mapper>

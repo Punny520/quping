@@ -15,6 +15,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 /**
  * @description:
@@ -48,18 +49,11 @@ public class RatingImpl implements RatingService{
      * @return
      */
     @Override
-    public Result getById(int id) {
-        //TODO 如果涉及到缓存删除，需要修改缓存重建逻辑，防止高并发情况缓存错误的数据
+    public Result<Rating> getById(int id) {
         String key = Constants.RATING_CACHE_PREFIX + id;
-        String ratingJSON = stringRedisTemplate.opsForValue().get(key);
-        //重建缓存防止并防止缓存穿透
-        if(ratingJSON == null){
-            Rating rating = ratingMapper.getById(id);
-            ratingJSON = (rating == null ? "" : JSONUtil.toJsonPrettyStr(rating));
-            stringRedisTemplate.opsForValue().set(key,ratingJSON,1, TimeUnit.DAYS);
-            return ratingJSON.equals("") ? Result.fail() : Result.ok(rating);
-        }
-        return ratingJSON.equals("")?Result.fail():Result.ok(JSONUtil.toBean(ratingJSON,Rating.class));
+        Rating entry = new Rating();
+        entry.setId(id);
+        return getByCache(key,Rating.class,entry,ratingMapper::getByEntry);
     }
 
     /**
@@ -69,10 +63,9 @@ public class RatingImpl implements RatingService{
      */
     @Override
     public Result doRating(UserRatingMappingDTO urmd) {
-        Rating rating = ratingMapper.getById(urmd.getRatingId());
-        if(rating == null){
-            return Result.fail();
-        }
+        Result result = getById(urmd.getRatingId());
+        if(result.getData()==null) return Result.fail();
+        Rating rating = (Rating) result.getData();
         UserRatingMapping urm = new UserRatingMapping();
         BeanUtil.copyProperties(urmd,urm);
         UserRatingMapping entry = userRatingMapper.getByEntry(urm);
@@ -108,5 +101,47 @@ public class RatingImpl implements RatingService{
         }
         res = ratingMapper.update(rating);
         return res>0?Result.ok():Result.fail();
+    }
+
+    /**
+     * 通过缓存获取数据
+     * @param key
+     * @param clzz
+     * @return
+     * @param <T>
+     */
+    private <T> Result<T> getByCache(String key, Class<T> clzz, T entry, Function<T,T> getByEntry){
+        String JSON = stringRedisTemplate.opsForValue().get(key);
+        if(JSON == null){
+            entry = cacheReBuild(key,clzz,entry,getByEntry);
+            if(entry == null){
+                stringRedisTemplate.opsForValue().set(key,"");
+                return Result.fail();
+            }else return Result.ok(entry);
+        }else if(JSON.equals("")){
+            return Result.fail();
+        }
+        entry = JSONUtil.toBean(JSON,clzz);
+        return Result.ok(entry);
+    }
+
+    /**
+     * 缓存重建
+     * @param key
+     * @param clzz
+     * @return
+     * @param <T>
+     */
+    private synchronized <T> T cacheReBuild(String key, Class<T> clzz,T entry,Function<T,T> getByEntry) {
+        String JSON = stringRedisTemplate.opsForValue().get(key);
+        if(JSON!=null){
+            if(JSON.equals("")) return null;//防止缓存穿透
+            return JSONUtil.toBean(JSON,clzz);
+        }else {
+            entry = getByEntry.apply(entry);
+            if(entry == null) stringRedisTemplate.opsForValue().set(key,"");
+            else stringRedisTemplate.opsForValue().set(key,JSONUtil.toJsonPrettyStr(entry),1,TimeUnit.DAYS);
+            return entry;
+        }
     }
 }

@@ -15,4 +15,6 @@ public interface RatingMapper {
     Rating getById(int id);
 
     int update(Rating rating);
+
+    Rating getByEntry(Rating rating);
 }

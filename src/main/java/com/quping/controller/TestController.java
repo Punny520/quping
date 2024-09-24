@@ -31,7 +31,7 @@ public class TestController {
     /**
      * 批量生成用户Token和请求体，保存
      */
-    @GetMapping("/{num}")
+    @GetMapping("token/{num}")
     public void generateTokens(@PathVariable("num") Integer num){
         try(FileOutputStream tokenFile = new FileOutputStream("src/main/resources/tokens.csv");
                 FileOutputStream urmFile = new FileOutputStream("src/main/resources/urmParam.csv")){
@@ -50,6 +50,21 @@ public class TestController {
                 tokenFile.write(token.getBytes());
                 if(num>0) tokenFile.write(System.lineSeparator().getBytes());//回车
                 String parm = 9+","+3;
+                urmFile.write(parm.getBytes());
+                if(num>0) urmFile.write(System.lineSeparator().getBytes());
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    @GetMapping("/postBody/{num}")
+    public void generatePostBody(@PathVariable("num") Integer num){
+        try(FileOutputStream urmFile = new FileOutputStream("src/main/resources/urmParam.csv")){
+            urmFile.write("ratingId,score".getBytes());
+            urmFile.write(System.lineSeparator().getBytes());
+            while((num--)>0){
+                String parm = 9+","+RandomUtil.randomInt(1,6);
                 urmFile.write(parm.getBytes());
                 if(num>0) urmFile.write(System.lineSeparator().getBytes());
             }

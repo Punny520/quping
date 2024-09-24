@@ -17,5 +17,5 @@ public final class Constants {
      */
     public static final String USER_SESSION_PREFIX = "quping:session:";
 
-    public static final String RATING_CACHE_PREFIX = "quping:rating:";
+    public static final String RATING_CACHE_PREFIX = "quping:cache:rating:";
 }

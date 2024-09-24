@@ -3,6 +3,7 @@ package com.quping.controller;
 import com.quping.common.Result;
 import com.quping.dto.RatingDTO;
 import com.quping.dto.UserRatingMappingDTO;
+import com.quping.entry.Rating;
 import com.quping.entry.User;
 import com.quping.service.RatingService;
 import com.quping.utils.UserHolder;
@@ -37,7 +38,7 @@ public class RatingController {
      * @return
      */
     @GetMapping("/{id}")
-    public Result getRating(@PathVariable int id){
+    public Result<Rating> getRating(@PathVariable int id){
         return ratingService.getById(id);
     }
 
