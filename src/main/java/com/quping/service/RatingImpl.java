@@ -10,6 +10,7 @@ import com.quping.dto.UserRatingMappingDTO;
 import com.quping.entry.Rating;
 import com.quping.dao.mapper.RatingMapper;
 import com.quping.entry.UserRatingMapping;
+import com.quping.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -24,12 +25,15 @@ import java.util.function.Function;
  */
 @Service
 public class RatingImpl implements RatingService{
+    private final RatingMapper ratingMapper;
+    private final UserRatingMapper userRatingMapper;
+    private final StringRedisTemplate stringRedisTemplate;
     @Autowired
-    RatingMapper ratingMapper;
-    @Autowired
-    UserRatingMapper userRatingMapper;
-    @Autowired
-    StringRedisTemplate stringRedisTemplate;
+    RatingImpl(RatingMapper ratingMapper,UserRatingMapper userRatingMapper,StringRedisTemplate stringRedisTemplate){
+        this.ratingMapper = ratingMapper;
+        this.userRatingMapper = userRatingMapper;
+        this.stringRedisTemplate =stringRedisTemplate;
+    }
     /**
      * 插入新评分
      * @param ratingDTO
@@ -53,7 +57,7 @@ public class RatingImpl implements RatingService{
         String key = Constants.RATING_CACHE_PREFIX + id;
         Rating entry = new Rating();
         entry.setId(id);
-        return getByCache(key,Rating.class,entry,ratingMapper::getByEntry);
+        return RedisUtil.getByCache(key,Rating.class,entry,ratingMapper::getByEntry);
     }
 
     /**
@@ -62,10 +66,10 @@ public class RatingImpl implements RatingService{
      * @return
      */
     @Override
-    public Result doRating(UserRatingMappingDTO urmd) {
-        Result result = getById(urmd.getRatingId());
+    public Result<Void> doRating(UserRatingMappingDTO urmd) {
+        Result<Rating> result = getById(urmd.getRatingId());
         if(result.getData()==null) return Result.fail();
-        Rating rating = (Rating) result.getData();
+        Rating rating = result.getData();
         UserRatingMapping urm = new UserRatingMapping();
         BeanUtil.copyProperties(urmd,urm);
         UserRatingMapping entry = userRatingMapper.getByEntry(urm);
@@ -101,47 +105,5 @@ public class RatingImpl implements RatingService{
         }
         res = ratingMapper.update(rating);
         return res>0?Result.ok():Result.fail();
-    }
-
-    /**
-     * 通过缓存获取数据
-     * @param key
-     * @param clzz
-     * @return
-     * @param <T>
-     */
-    private <T> Result<T> getByCache(String key, Class<T> clzz, T entry, Function<T,T> getByEntry){
-        String JSON = stringRedisTemplate.opsForValue().get(key);
-        if(JSON == null){
-            entry = cacheReBuild(key,clzz,entry,getByEntry);
-            if(entry == null){
-                stringRedisTemplate.opsForValue().set(key,"");
-                return Result.fail();
-            }else return Result.ok(entry);
-        }else if(JSON.equals("")){
-            return Result.fail();
-        }
-        entry = JSONUtil.toBean(JSON,clzz);
-        return Result.ok(entry);
-    }
-
-    /**
-     * 缓存重建
-     * @param key
-     * @param clzz
-     * @return
-     * @param <T>
-     */
-    private synchronized <T> T cacheReBuild(String key, Class<T> clzz,T entry,Function<T,T> getByEntry) {
-        String JSON = stringRedisTemplate.opsForValue().get(key);
-        if(JSON!=null){
-            if(JSON.equals("")) return null;//防止缓存穿透
-            return JSONUtil.toBean(JSON,clzz);
-        }else {
-            entry = getByEntry.apply(entry);
-            if(entry == null) stringRedisTemplate.opsForValue().set(key,"");
-            else stringRedisTemplate.opsForValue().set(key,JSONUtil.toJsonPrettyStr(entry),1,TimeUnit.DAYS);
-            return entry;
-        }
     }
 }
