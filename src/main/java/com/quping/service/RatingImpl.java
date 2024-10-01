@@ -66,7 +66,7 @@ public class RatingImpl implements RatingService{
      * @return
      */
     @Override
-    public Result<Void> doRating(UserRatingMappingDTO urmd) {
+    public synchronized Result<Void> doRating(UserRatingMappingDTO urmd) {
         Result<Rating> result = getById(urmd.getRatingId());
         if(result.getData()==null) return Result.fail();
         Rating rating = result.getData();
@@ -103,6 +103,7 @@ public class RatingImpl implements RatingService{
             entry.setScore(urm.getScore());
             userRatingMapper.update(entry);
         }
+        stringRedisTemplate.delete(Constants.RATING_CACHE_PREFIX+rating.getId());
         res = ratingMapper.update(rating);
         return res>0?Result.ok():Result.fail();
     }
