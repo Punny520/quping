@@ -29,7 +29,6 @@ public class UserRatingMapperServiceImpl implements UserRatingMapperService{
     @Override
     public UserRatingMapping getByEntry(UserRatingMapping userRatingMapping) {
         String key = Constants.USER_RATING_MAPPING_CACHE_PREFIX + userRatingMapping.getId();
-        Result<UserRatingMapping> result = RedisUtil.getByCache(key,UserRatingMapping.class,userRatingMapping,userRatingMapper::getByEntry);
-        return  result.getData();
+        return RedisUtil.getByCache(key,UserRatingMapping.class,userRatingMapping,userRatingMapper::getByEntry);
     }
 }

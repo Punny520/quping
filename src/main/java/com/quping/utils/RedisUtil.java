@@ -29,19 +29,19 @@ public class RedisUtil {
      * @return
      * @param <T>
      */
-    public static <T> Result<T> getByCache(String key, Class<T> clzz, T entry, Function<T,T> getByEntry){
+    public static <T> T getByCache(String key, Class<T> clzz, T entry, Function<T,T> getByEntry){
         String JSON = stringRedisTemplate.opsForValue().get(key);
         if(JSON == null){
             entry = cacheReBuild(key,clzz,entry,getByEntry);
             if(entry == null){
                 stringRedisTemplate.opsForValue().set(key,"");
-                return Result.fail();
-            }else return Result.ok(entry);
+                return null;
+            }else return entry;
         }else if(JSON.equals("")){
-            return Result.fail();
+            return null;
         }
         entry = JSONUtil.toBean(JSON,clzz);
-        return Result.ok(entry);
+        return entry;
     }
 
     /**

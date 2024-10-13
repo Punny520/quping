@@ -9,10 +9,7 @@ import com.quping.dto.UserRatingMappingDTO;
 import com.quping.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -58,18 +55,40 @@ public class TestController {
         }
     }
 
-    @GetMapping("/postBody/{num}")
-    public void generatePostBody(@PathVariable("num") Integer num){
+    /**
+     * 根据参数生成对应UserRatingMapping
+     * @param num 生成个数
+     * @param ratingId
+     * @param score
+     * @param random 是否分数随机
+     */
+    @GetMapping("/urm_gen")
+    public void UserRatingMappingGenerator(
+            @RequestParam("num") Integer num,
+            @RequestParam("ratingId") Integer ratingId,
+            @RequestParam("score") Integer score,
+            @RequestParam("random") Boolean random){
+        double expectFinalScore = 0;
+        int total = num;
+        int totalScore = 0;
         try(FileOutputStream urmFile = new FileOutputStream("src/main/resources/urmParam.csv")){
             urmFile.write("ratingId,score".getBytes());
             urmFile.write(System.lineSeparator().getBytes());
             while((num--)>0){
-                String parm = 9+","+RandomUtil.randomInt(1,6);
-                urmFile.write(parm.getBytes());
+                int tmpScore = random ? RandomUtil.randomInt(1,11) : score;
+                totalScore+=tmpScore;
+                String param = ratingId+","+tmpScore;
+                urmFile.write(param.getBytes());
                 if(num>0) urmFile.write(System.lineSeparator().getBytes());
             }
         }catch (IOException e){
             e.printStackTrace();
+        }finally {
+            expectFinalScore = totalScore/(total*1.0);
+            log.info("生成完成!" +
+                    "生成个数:{}" +
+                    "总评分:{}" +
+                    "期望平均评分:{}",total,totalScore,expectFinalScore);
         }
     }
 

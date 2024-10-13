@@ -37,4 +37,8 @@ public class RatingDTO {
      * 评分人数
      */
     private Integer count;
+    /**
+     * 用户打分
+     */
+    private Integer myScore;
 }

@@ -5,11 +5,14 @@ import com.quping.common.Result;
 import com.quping.dto.RatingDTO;
 import com.quping.dto.UserRatingMappingDTO;
 import com.quping.entry.Rating;
+import com.quping.entry.UserRatingMapping;
 
 public interface RatingService {
-    Result insert(RatingDTO ratingDTO);
+    Result<Void> insert(RatingDTO ratingDTO);
 
-    Result<Rating> getById(int id);
+    Rating getById(int id);
 
     Result doRating(UserRatingMappingDTO urmd);
+
+    UserRatingMapping getUserRating(Integer userId, Integer ratingId);
 }

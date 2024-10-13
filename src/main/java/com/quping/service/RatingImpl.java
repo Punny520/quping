@@ -1,7 +1,6 @@
 package com.quping.service;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.json.JSONUtil;
 import com.quping.common.Constants;
 import com.quping.common.Result;
 import com.quping.dao.mapper.UserRatingMapper;
@@ -14,9 +13,6 @@ import com.quping.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 /**
  * @description:
@@ -40,7 +36,7 @@ public class RatingImpl implements RatingService{
      * @return
      */
     @Override
-    public Result insert(RatingDTO ratingDTO) {
+    public Result<Void> insert(RatingDTO ratingDTO) {
         Rating rating = new Rating();
         BeanUtil.copyProperties(ratingDTO,rating);
         ratingMapper.insert(rating);
@@ -53,7 +49,7 @@ public class RatingImpl implements RatingService{
      * @return
      */
     @Override
-    public Result<Rating> getById(int id) {
+    public Rating getById(int id) {
         String key = Constants.RATING_CACHE_PREFIX + id;
         Rating entry = new Rating();
         entry.setId(id);
@@ -67,9 +63,8 @@ public class RatingImpl implements RatingService{
      */
     @Override
     public synchronized Result<Void> doRating(UserRatingMappingDTO urmd) {
-        Result<Rating> result = getById(urmd.getRatingId());
-        if(result.getData()==null) return Result.fail();
-        Rating rating = result.getData();
+        Rating rating = getById(urmd.getRatingId());
+        if(rating == null) return Result.fail();
         UserRatingMapping urm = new UserRatingMapping();
         BeanUtil.copyProperties(urmd,urm);
         UserRatingMapping entry = userRatingMapper.getByEntry(urm);
@@ -106,5 +101,19 @@ public class RatingImpl implements RatingService{
         stringRedisTemplate.delete(Constants.RATING_CACHE_PREFIX+rating.getId());
         res = ratingMapper.update(rating);
         return res>0?Result.ok():Result.fail();
+    }
+
+    /**
+     * 查看用户对应的评分
+     * @param userId
+     * @param ratingId
+     * @return
+     */
+    @Override
+    public UserRatingMapping getUserRating(Integer userId, Integer ratingId) {
+        UserRatingMapping userRatingMapping = new UserRatingMapping();
+        userRatingMapping.setUserId(userId);
+        userRatingMapping.setRatingId(ratingId);
+        return userRatingMapper.getByEntry(userRatingMapping);
     }
 }
