@@ -20,4 +20,8 @@ public final class Constants {
     public static final String RATING_CACHE_PREFIX = "quping:cache:rating:";
 
     public static final String USER_RATING_MAPPING_CACHE_PREFIX = "quping:cache:userRatingMapping:";
+    /**
+     * 记录用户登入的集合
+     */
+    public static final String USER_LOGIN_TOKEN = "quping:token:";
 }

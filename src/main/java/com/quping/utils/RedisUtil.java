@@ -1,9 +1,7 @@
 package com.quping.utils;
 
 import cn.hutool.json.JSONUtil;
-import com.quping.common.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 

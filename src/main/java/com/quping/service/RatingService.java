@@ -12,7 +12,7 @@ public interface RatingService {
 
     Rating getById(int id);
 
-    Result doRating(UserRatingMappingDTO urmd);
+    Result<Void> doRating(UserRatingMappingDTO urmd);
 
     UserRatingMapping getUserRating(Integer userId, Integer ratingId);
 }

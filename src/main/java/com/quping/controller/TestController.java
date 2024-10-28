@@ -36,7 +36,8 @@ public class TestController {
             urmFile.write(System.lineSeparator().getBytes());
             while((num--)>0){
                 String phoneNumber = getRandomPhoneNumber();
-                String code = userService.getCode(phoneNumber);
+                //TODO 有问题待修改
+                String code = (String) userService.getCode(phoneNumber).getData();
                 UserDTO userDTO = new UserDTO();
                 userDTO.setCode(code);
                 userDTO.setPhoneNumber(phoneNumber);

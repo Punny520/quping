@@ -3,14 +3,16 @@ package com.quping.service;
 
 import com.quping.common.Result;
 import com.quping.dto.UserDTO;
+import com.quping.entry.User;
 
 public interface UserService {
-    String getCode(String phoneNumber);
+    Result<?> getCode(String phoneNumber);
 
-    Result doLogin(UserDTO userDTO);
+    Result<String> doLogin(UserDTO userDTO);
 
-    Result addUser(UserDTO userDTO);
+    Result<?> addUser(UserDTO userDTO);
 
-    Result showProfile();
+    Result<User> showProfile();
 
+    Result<Void> loginOut();
 }

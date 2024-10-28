@@ -2,6 +2,7 @@ package com.quping.controller;
 
 import com.quping.common.Result;
 import com.quping.dto.UserDTO;
+import com.quping.entry.User;
 import com.quping.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,19 +13,22 @@ import org.springframework.web.bind.annotation.*;
  * @date: 2024/8/25 23:09
  */
 @RestController
+@RequestMapping("/user")
 public class UserController {
-    @Autowired
     private UserService userService;
+    @Autowired
+    UserController(UserService userService){
+        this.userService = userService;
+    }
     /**
      * 根据手机号获取验证码
      * @param phoneNumber
      * @return
      */
     @GetMapping("/getCode")
-    public Result code(@RequestParam("phoneNumber") String phoneNumber){
-        // TODO 验证phoneNumber
-        userService.getCode(phoneNumber);
-        return Result.ok(phoneNumber);
+    public Result<?> code(@RequestParam("phoneNumber") String phoneNumber){
+        //TODO 验证phoneNumber
+        return userService.getCode(phoneNumber);
     }
 
     /**
@@ -33,8 +37,8 @@ public class UserController {
      * @return
      */
     @PostMapping("/doLogin")
-    public Result doLogin(@RequestBody UserDTO userDTO){
-        //TODO 验证
+    public Result<String> doLogin(@RequestBody UserDTO userDTO){
+        //TODO 参数验证
         return userService.doLogin(userDTO);
     }
 
@@ -43,8 +47,8 @@ public class UserController {
      * @param userDTO
      * @return
      */
-    @PostMapping("/addUser")
-    public Result addUser(@RequestBody UserDTO userDTO){
+    @PostMapping("/add")
+    public Result<?> addUser(@RequestBody UserDTO userDTO){
         return userService.addUser(userDTO);
     }
 
@@ -53,7 +57,12 @@ public class UserController {
      * @return
      */
     @GetMapping("/me")
-    public Result me(){
+    public Result<User> me(){
         return userService.showProfile();
+    }
+
+    @GetMapping("/loginOut")
+    public Result<Void> loginOut(){
+        return userService.loginOut();
     }
 }

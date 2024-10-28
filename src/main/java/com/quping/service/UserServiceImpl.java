@@ -34,14 +34,26 @@ public class UserServiceImpl implements UserService{
      * @param phoneNumber
      */
     @Override
-    public String getCode(String phoneNumber) {
-        //TODO 验证码发送
+    public Result<?> getCode(String phoneNumber) {
         String code = RandomUtil.randomNumbers(6);
-        log.info("验证码为：{} 5分钟内有效",code);
         //构造key存入Redis中设置5分钟过期
         String loginKey = Constants.VERIFICATION_CODE_PREFIX + phoneNumber;
-        redisTemplate.opsForValue().set(loginKey,code,5, TimeUnit.MINUTES);
-        return code;
+        Boolean status = redisTemplate.opsForValue().setIfAbsent(loginKey,code,5, TimeUnit.MINUTES);
+        if(Boolean.FALSE.equals(status)){
+            return Result.fail("发送验证码失败，请勿频繁请求！");
+        }
+        //TODO 验证码发送
+        sendCode(code);
+        return Result.ok(phoneNumber);
+    }
+
+    /**
+     * 发送短信逻辑
+     * @param code
+     */
+    private void sendCode(String code) {
+        //在这里对接第三方发送短信api
+        log.info("验证码为：{} 5分钟内有效",code);
     }
 
     /**
@@ -50,7 +62,7 @@ public class UserServiceImpl implements UserService{
      * @return
      */
     @Override
-    public Result doLogin(UserDTO userDTO) {
+    public Result<String> doLogin(UserDTO userDTO) {
         if(userDTO.getPassword() != null && !userDTO.getPassword().equals("")){
             return doLoginByPassword(userDTO);
         }else return doLoginByCode(userDTO);
@@ -61,7 +73,7 @@ public class UserServiceImpl implements UserService{
      * @param userDTO
      * @return
      */
-    private Result doLoginByCode(UserDTO userDTO) {
+    private Result<String> doLoginByCode(UserDTO userDTO) {
         String loginKey = Constants.VERIFICATION_CODE_PREFIX + userDTO.getPhoneNumber();
         String code = redisTemplate.opsForValue().get(loginKey);
         if(!userDTO.getCode().equals(code)){
@@ -81,13 +93,26 @@ public class UserServiceImpl implements UserService{
 
     /**
      * 存储用户会话信息并返回token
+     * 
      * @param user
      * @return
      */
     private String getUserToken(User user){
-        //TODO 逻辑优化防止相同用户生成不同token等
-        String token = UUID.randomUUID().toString(true);
+        String token = null;
+        String idTokenKey = Constants.USER_LOGIN_TOKEN+user.getId();
+        Boolean keyExists = redisTemplate.hasKey(idTokenKey);
+        if(Boolean.TRUE.equals(keyExists)){
+            //表示用户之前登入过，判断该token是否已经过期，没过期就返回，防止用户一直登录一直生成新的token
+            token = redisTemplate.opsForValue().get(idTokenKey);
+            Boolean tokenExists = redisTemplate.hasKey(Constants.USER_SESSION_PREFIX + token);
+            if(Boolean.TRUE.equals(tokenExists)){
+                return token;
+            }
+        }
+        //生成新token
+        token = UUID.randomUUID().toString(true);
         String userSession = JSONUtil.toJsonPrettyStr(user);
+        redisTemplate.opsForValue().set(idTokenKey,token,1,TimeUnit.DAYS);
         redisTemplate.opsForValue().set( Constants.USER_SESSION_PREFIX + token,userSession,1,TimeUnit.DAYS);
         return token;
     }
@@ -97,7 +122,7 @@ public class UserServiceImpl implements UserService{
      * @param userDTO
      * @return
      */
-    private Result doLoginByPassword(UserDTO userDTO) {
+    private Result<String> doLoginByPassword(UserDTO userDTO) {
         User user = userMapper.getUserByPhoneNumber(userDTO.getPhoneNumber());
         if(user == null) return Result.failWithMsg("账号或密码错误");
         //TODO 密码明文加密
@@ -112,7 +137,7 @@ public class UserServiceImpl implements UserService{
      * @return
      */
     @Override
-    public Result addUser(UserDTO userDTO) {
+    public Result<?> addUser(UserDTO userDTO) {
         User user = new User();
         user.setNickName(userDTO.getNickName());
         user.setPhoneNumber(userDTO.getPhoneNumber());
@@ -126,8 +151,25 @@ public class UserServiceImpl implements UserService{
      * @return
      */
     @Override
-    public Result showProfile() {
+    public Result<User> showProfile() {
         //TODO 暂时先返回用户全部信息
         return Result.ok(UserHolder.getUserSession());
+    }
+
+    /**
+     * 登出
+     * @return
+     */
+    @Override
+    public Result<Void> loginOut() {
+        User user = UserHolder.getUserSession();
+        String idTokenKey = Constants.USER_LOGIN_TOKEN+user.getId();
+        Boolean keyExists = redisTemplate.hasKey(idTokenKey);
+        if(Boolean.TRUE.equals(keyExists)){
+            String tokenKey = Constants.USER_SESSION_PREFIX + redisTemplate.opsForValue().get(idTokenKey);
+            redisTemplate.delete(tokenKey);
+        }
+        redisTemplate.delete(idTokenKey);
+        return Result.ok();
     }
 }

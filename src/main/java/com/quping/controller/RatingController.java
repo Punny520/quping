@@ -18,15 +18,17 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/rating")
 public class RatingController {
+    private final RatingService ratingService;
     @Autowired
-    private RatingService ratingService;
-
+    RatingController(RatingService ratingService){
+        this.ratingService = ratingService;
+    }
     /**
      * 插入评分
      * @param ratingDTO
      * @return
      */
-    @PostMapping
+    @PostMapping("/add")
     public Result<Void> addRating(@RequestBody RatingDTO ratingDTO){
         //TODO 参数验证
         return ratingService.insert(ratingDTO);
@@ -37,7 +39,7 @@ public class RatingController {
      * @param id
      * @return
      */
-    @GetMapping("/{id}")
+    @GetMapping("/show/{id}")
     public Result<RatingDTO> getRating(@PathVariable int id){
         RatingDTO ratingDTO = new RatingDTO();
         BeanUtil.copyProperties(ratingService.getById(id),ratingDTO);
@@ -55,7 +57,7 @@ public class RatingController {
      * @return
      */
     @PostMapping("/doRating")
-    public Result doRating(@RequestBody UserRatingMappingDTO urmd){
+    public Result<Void> doRating(@RequestBody UserRatingMappingDTO urmd){
         User user = UserHolder.getUserSession();
         urmd.setUserId(user.getId());
         return ratingService.doRating(urmd);
@@ -67,7 +69,7 @@ public class RatingController {
      * @param ratingId
      * @return
      */
-    @GetMapping("/{userId}/{ratingId}")
+    @GetMapping("/show/{userId}/{ratingId}")
     public Result<UserRatingMappingDTO> getUserRating(@PathVariable("userId") Integer userId,
                                 @PathVariable("ratingId") Integer ratingId){
         UserRatingMappingDTO userRatingMappingDTO = new UserRatingMappingDTO();
