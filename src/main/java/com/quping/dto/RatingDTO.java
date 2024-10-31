@@ -41,4 +41,9 @@ public class RatingDTO {
      * 用户打分
      */
     private Integer myScore;
+
+    /**
+     * 创建人
+     */
+    private Integer createBy;
 }

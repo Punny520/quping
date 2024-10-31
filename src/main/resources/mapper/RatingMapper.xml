@@ -5,8 +5,8 @@
 <mapper namespace="com.quping.dao.mapper.RatingMapper">
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO rating (id, image_url, score, title, `text`, `count`)
-                    VALUES (null,#{imageUrl},#{score},#{title},#{text},#{count});
+        INSERT INTO rating (id, image_url, score, title, `text`, `count`, `create_by`)
+                    VALUES (null,#{imageUrl},#{score},#{title},#{text},#{count},#{createBy});
     </insert>
     <update id="update">
         UPDATE rating

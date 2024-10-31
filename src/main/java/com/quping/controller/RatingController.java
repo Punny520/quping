@@ -35,6 +35,17 @@ public class RatingController {
     }
 
     /**
+     * 用户创建新评分
+     * @param ratingDTO
+     * @return
+     */
+    @PostMapping("/create")
+    public Result<Void> createRating(@RequestBody RatingDTO ratingDTO){
+        //TODO 参数验证
+        return ratingService.create(ratingDTO);
+    }
+
+    /**
      * 根据id获取评分
      * @param id
      * @return

@@ -37,4 +37,9 @@ public class Rating {
      * 评分人数
      */
     private Integer count;
+
+    /**
+     * 创建人
+     */
+    private Integer createBy;
 }

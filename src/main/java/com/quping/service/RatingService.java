@@ -15,4 +15,6 @@ public interface RatingService {
     Result<Void> doRating(UserRatingMappingDTO urmd);
 
     UserRatingMapping getUserRating(Integer userId, Integer ratingId);
+
+    Result<Void> create(RatingDTO ratingDTO);
 }

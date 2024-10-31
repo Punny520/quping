@@ -8,8 +8,10 @@ import com.quping.dto.RatingDTO;
 import com.quping.dto.UserRatingMappingDTO;
 import com.quping.entry.Rating;
 import com.quping.dao.mapper.RatingMapper;
+import com.quping.entry.User;
 import com.quping.entry.UserRatingMapping;
 import com.quping.utils.RedisUtil;
+import com.quping.utils.UserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -20,12 +22,12 @@ import org.springframework.stereotype.Service;
  * @date: 2024/9/10 21:34
  */
 @Service
-public class RatingImpl implements RatingService{
+public class RatingServiceImpl implements RatingService{
     private final RatingMapper ratingMapper;
     private final UserRatingMapper userRatingMapper;
     private final StringRedisTemplate stringRedisTemplate;
     @Autowired
-    RatingImpl(RatingMapper ratingMapper,UserRatingMapper userRatingMapper,StringRedisTemplate stringRedisTemplate){
+    RatingServiceImpl(RatingMapper ratingMapper, UserRatingMapper userRatingMapper, StringRedisTemplate stringRedisTemplate){
         this.ratingMapper = ratingMapper;
         this.userRatingMapper = userRatingMapper;
         this.stringRedisTemplate =stringRedisTemplate;
@@ -115,5 +117,19 @@ public class RatingImpl implements RatingService{
         userRatingMapping.setUserId(userId);
         userRatingMapping.setRatingId(ratingId);
         return userRatingMapper.getByEntry(userRatingMapping);
+    }
+
+    /**
+     * 用户创建新评分
+     * @param ratingDTO
+     * @return
+     */
+    @Override
+    public Result<Void> create(RatingDTO ratingDTO) {
+        Rating rating = new Rating();
+        BeanUtil.copyProperties(ratingDTO,rating);
+        User user = UserHolder.getUserSession();
+        rating.setCreateBy(user.getId());
+        return ratingMapper.insert(rating) > 0 ? Result.ok():Result.fail();
     }
 }
