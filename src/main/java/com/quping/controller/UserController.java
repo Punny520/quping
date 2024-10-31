@@ -15,20 +15,20 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    private UserService userService;
+    private final UserService userService;
     @Autowired
     UserController(UserService userService){
         this.userService = userService;
     }
     /**
-     * 根据手机号获取验证码
-     * @param phoneNumber
+     * 根据手机号或者邮箱获取验证码
+     * @param phoneOrMail
      * @return
      */
     @GetMapping("/getCode")
-    public Result<?> code(@RequestParam("phoneNumber") String phoneNumber){
-        //TODO 验证phoneNumber
-        return userService.getCode(phoneNumber);
+    public Result<?> code(@RequestParam("phoneOrMail") String phoneOrMail){
+        //TODO 验证手机号或者邮箱
+        return userService.getCode(phoneOrMail);
     }
 
     /**

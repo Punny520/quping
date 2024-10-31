@@ -33,4 +33,8 @@ public class UserDTO {
      * 验证码
      */
     private String code;
+    /**
+     * 邮箱
+     */
+    private String email;
 }

@@ -1,7 +1,10 @@
 package com.quping.service;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.UUID;
+import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.quping.common.Constants;
 import com.quping.common.Result;
@@ -14,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -28,32 +32,29 @@ public class UserServiceImpl implements UserService{
     StringRedisTemplate redisTemplate;
     @Autowired
     UserMapper userMapper;
+    @Autowired
+    MailService mailService;
     /**
      * 获取登录验证码
-     *
-     * @param phoneNumber
+     * @param phoneOrMail 传入手机或者邮箱
      */
     @Override
-    public Result<?> getCode(String phoneNumber) {
+    public Result<?> getCode(String phoneOrMail) {
         String code = RandomUtil.randomNumbers(6);
         //构造key存入Redis中设置5分钟过期
-        String loginKey = Constants.VERIFICATION_CODE_PREFIX + phoneNumber;
+        String loginKey = Constants.VERIFICATION_CODE_PREFIX + phoneOrMail;
         Boolean status = redisTemplate.opsForValue().setIfAbsent(loginKey,code,5, TimeUnit.MINUTES);
         if(Boolean.FALSE.equals(status)){
             return Result.fail("发送验证码失败，请勿频繁请求！");
         }
         //TODO 验证码发送
-        sendCode(code);
-        return Result.ok(phoneNumber);
-    }
-
-    /**
-     * 发送短信逻辑
-     * @param code
-     */
-    private void sendCode(String code) {
-        //在这里对接第三方发送短信api
-        log.info("验证码为：{} 5分钟内有效",code);
+        if(Validator.isEmail(phoneOrMail)){
+            String msg = String.format("验证码为：%s 5分钟内有效",code);
+            mailService.sendTo(phoneOrMail,msg);
+        }else{
+            log.info("验证码为：{} 5分钟内有效",code);
+        }
+        return Result.ok(phoneOrMail);
     }
 
     /**
@@ -74,20 +75,25 @@ public class UserServiceImpl implements UserService{
      * @return
      */
     private Result<String> doLoginByCode(UserDTO userDTO) {
-        String loginKey = Constants.VERIFICATION_CODE_PREFIX + userDTO.getPhoneNumber();
+        String loginKey = null;
+        if(!StrUtil.isBlank(userDTO.getPhoneNumber())){
+            loginKey = Constants.VERIFICATION_CODE_PREFIX + userDTO.getPhoneNumber();
+        }else loginKey = Constants.VERIFICATION_CODE_PREFIX + userDTO.getEmail();
+
         String code = redisTemplate.opsForValue().get(loginKey);
         if(!userDTO.getCode().equals(code)){
             return Result.failWithMsg("验证码错误");
         }
-        User user = userMapper.getUserByPhoneNumber(userDTO.getPhoneNumber());
-        if(user == null){
-            //创建新用户设置初始值
-            user = new User();
-            user.setPassword("123456");
-            user.setNickName(RandomUtil.randomString(10));
-            user.setPhoneNumber(userDTO.getPhoneNumber());
-            userMapper.insertUser(user);
+        User user = new User();
+        BeanUtil.copyProperties(userDTO,user);
+        List<User> userList = userMapper.getUser(user);
+        if(userList!=null&&userList.size()>0){
+            return Result.ok(getUserToken(userList.get(0)));
         }
+        //注册用户，设置默认值
+        user.setPassword("123456");
+        user.setNickName(RandomUtil.randomString(10));
+        userMapper.insertUser(user);
         return Result.ok(getUserToken(user));
     }
 
@@ -123,13 +129,14 @@ public class UserServiceImpl implements UserService{
      * @return
      */
     private Result<String> doLoginByPassword(UserDTO userDTO) {
-        User user = userMapper.getUserByPhoneNumber(userDTO.getPhoneNumber());
-        if(user == null) return Result.failWithMsg("账号或密码错误");
-        //TODO 密码明文加密
-        if(!userDTO.getPassword().equals(user.getPassword())) return Result.failWithMsg("账号或密码错误");
-        return Result.ok(getUserToken(user));
+        User user = new User();
+        BeanUtil.copyProperties(userDTO,user);
+        List<User> userList = userMapper.getUser(user);
+        if(userList==null||userList.size()==0){
+            return Result.failWithMsg("账号或密码错误");
+        }
+        return Result.ok(getUserToken(userList.get(0)));
     }
-
 
     /**
      * 添加用户
@@ -139,9 +146,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public Result<?> addUser(UserDTO userDTO) {
         User user = new User();
-        user.setNickName(userDTO.getNickName());
-        user.setPhoneNumber(userDTO.getPhoneNumber());
-        user.setPassword(userDTO.getPassword());
+        BeanUtil.copyProperties(userDTO,user);
         int result = userMapper.insertUser(user);
         return result != 1?Result.failWithMsg("添加用户失败"):Result.ok();
     }
