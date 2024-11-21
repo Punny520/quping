@@ -1,4 +1,4 @@
-package com.quping.service;
+package com.quping.service.Impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.UUID;
@@ -11,6 +11,8 @@ import com.quping.common.Result;
 import com.quping.dto.UserDTO;
 import com.quping.entry.User;
 import com.quping.dao.mapper.UserMapper;
+import com.quping.service.MailService;
+import com.quping.service.UserService;
 import com.quping.utils.UserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 @Slf4j
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     @Autowired
     StringRedisTemplate redisTemplate;
     @Autowired

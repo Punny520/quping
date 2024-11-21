@@ -1,4 +1,4 @@
-package com.quping.service;
+package com.quping.service.Impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.quping.common.Constants;
@@ -10,6 +10,7 @@ import com.quping.entry.Rating;
 import com.quping.dao.mapper.RatingMapper;
 import com.quping.entry.User;
 import com.quping.entry.UserRatingMapping;
+import com.quping.service.RatingService;
 import com.quping.utils.RedisUtil;
 import com.quping.utils.UserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ import org.springframework.stereotype.Service;
  * @date: 2024/9/10 21:34
  */
 @Service
-public class RatingServiceImpl implements RatingService{
+public class RatingServiceImpl implements RatingService {
     private final RatingMapper ratingMapper;
     private final UserRatingMapper userRatingMapper;
     private final StringRedisTemplate stringRedisTemplate;

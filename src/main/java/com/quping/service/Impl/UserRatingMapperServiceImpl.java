@@ -1,9 +1,9 @@
-package com.quping.service;
+package com.quping.service.Impl;
 
 import com.quping.common.Constants;
-import com.quping.common.Result;
 import com.quping.dao.mapper.UserRatingMapper;
 import com.quping.entry.UserRatingMapping;
+import com.quping.service.UserRatingMapperService;
 import com.quping.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
  * @date: 2024/9/24 14:59
  */
 @Service
-public class UserRatingMapperServiceImpl implements UserRatingMapperService{
+public class UserRatingMapperServiceImpl implements UserRatingMapperService {
     private UserRatingMapper userRatingMapper;
     @Autowired
     UserRatingMapperServiceImpl(UserRatingMapper userRatingMapper){

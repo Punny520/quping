@@ -11,7 +11,7 @@
  Target Server Version : 50742 (5.7.42)
  File Encoding         : 65001
 
- Date: 15/09/2024 16:28:28
+ Date: 16/11/2024 18:34:52
 */
 
 SET NAMES utf8mb4;
@@ -28,17 +28,9 @@ CREATE TABLE `rating`  (
   `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `text` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `count` int(11) NULL DEFAULT NULL,
+  `create_by` int(11) NULL DEFAULT NULL COMMENT '创建人',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of rating
--- ----------------------------
-INSERT INTO `rating` VALUES (5, 'https://image123', 1.5, '测试标题', '正文', NULL);
-INSERT INTO `rating` VALUES (6, 'https://image123', 1.5, '测试标题1', '正文', NULL);
-INSERT INTO `rating` VALUES (7, 'https://image123', 1.5, '测试标题1', '正文', NULL);
-INSERT INTO `rating` VALUES (8, 'https://image123', 1.5, '测试标题1', '正文', NULL);
-INSERT INTO `rating` VALUES (9, 'https://image123', 0, 'Java', 'Java语言', 0);
+) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for user
@@ -49,17 +41,9 @@ CREATE TABLE `user`  (
   `nick_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '昵称',
   `phone_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '手机号',
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '密码',
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '邮箱',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of user
--- ----------------------------
-INSERT INTO `user` VALUES (1, 'punny', '13333333333', '123456');
-INSERT INTO `user` VALUES (2, 'punny', '13333333334', '123456');
-INSERT INTO `user` VALUES (3, 'BfC47bZs9H', '18070403876', '123456');
-INSERT INTO `user` VALUES (4, 'punny11', '14333333333', '123456');
-INSERT INTO `user` VALUES (5, 'punny22', '14433333333', '123456');
+) ENGINE = InnoDB AUTO_INCREMENT = 1005 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for user_rating_mapping
@@ -71,10 +55,6 @@ CREATE TABLE `user_rating_mapping`  (
   `rating_id` int(11) NOT NULL,
   `score` int(11) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of user_rating_mapping
--- ----------------------------
+) ENGINE = InnoDB AUTO_INCREMENT = 1002 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

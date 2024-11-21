@@ -1,5 +1,6 @@
-package com.quping.service;
+package com.quping.service.Impl;
 
+import com.quping.service.MailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -12,7 +13,7 @@ import javax.mail.internet.MimeMessage;
  * @date: 2024/10/31 10:04
  */
 @Service
-public class MailServiceImpl implements MailService{
+public class MailServiceImpl implements MailService {
     @Autowired
     private JavaMailSender javaMailSender;
     @Override
