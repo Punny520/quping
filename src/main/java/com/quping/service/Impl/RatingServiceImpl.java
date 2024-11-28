@@ -2,6 +2,7 @@ package com.quping.service.Impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.quping.common.Constants;
+import com.quping.common.PageInfo;
 import com.quping.common.Result;
 import com.quping.dao.mapper.UserRatingMapper;
 import com.quping.dto.RatingDTO;
@@ -16,6 +17,9 @@ import com.quping.utils.UserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @description:
@@ -132,5 +136,16 @@ public class RatingServiceImpl implements RatingService {
         User user = UserHolder.getUserSession();
         rating.setCreateBy(user.getId());
         return ratingMapper.insert(rating) > 0 ? Result.ok():Result.fail();
+    }
+
+    @Override
+    public Result<List<RatingDTO>> page(PageInfo pageInfo) {
+        List<Rating> ratingList = ratingMapper.page(pageInfo);
+        List<RatingDTO> ratingDTOList = ratingList.stream().map(e -> {
+            RatingDTO ratingDTO = new RatingDTO();
+            BeanUtil.copyProperties(e, ratingDTO);
+            return ratingDTO;
+        }).collect(Collectors.toList());
+        return Result.page(ratingDTOList,pageInfo);
     }
 }

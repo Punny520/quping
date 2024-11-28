@@ -23,6 +23,21 @@ public class Result<T> {
      * 数据
      */
     private T data;
+    /**
+     * 分页用
+     */
+    private PageInfo pageInfo;
+
+    Result(String code,String msg,T data){
+        this.code = code;
+        this.msg = msg;
+        this.data = data;
+    }
+
+    public static <T> Result<T> page(T data,PageInfo pageInfo){
+        return new Result<>("1","ok",data,pageInfo);
+    }
+
     public static <T> Result<T> ok(T data){
         return new Result<>("1","ok",data);
     }

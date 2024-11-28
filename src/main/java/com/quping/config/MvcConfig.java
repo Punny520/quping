@@ -27,6 +27,7 @@ public class MvcConfig implements WebMvcConfigurer {
                         "/user/doLogin",
                         "/user/add",
                         "/rating/add",
+                        "/rating/page",
                         "/rating/show/**",
                         "/test/**");
     }

@@ -1,6 +1,7 @@
 package com.quping.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.quping.common.PageInfo;
 import com.quping.common.Result;
 import com.quping.dto.RatingDTO;
 import com.quping.dto.UserRatingMappingDTO;
@@ -9,6 +10,8 @@ import com.quping.service.RatingService;
 import com.quping.utils.UserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @description: 评分相关Controller
@@ -86,5 +89,15 @@ public class RatingController {
         UserRatingMappingDTO userRatingMappingDTO = new UserRatingMappingDTO();
         BeanUtil.copyProperties(ratingService.getUserRating(userId,ratingId),userRatingMappingDTO);
         return Result.ok(userRatingMappingDTO);
+    }
+
+    /**
+     * 分页查询
+     * @param pageInfo
+     * @return
+     */
+    @PostMapping("/page")
+    public Result<List<RatingDTO>> page(@RequestBody PageInfo pageInfo){
+        return ratingService.page(pageInfo);
     }
 }

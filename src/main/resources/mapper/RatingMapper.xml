@@ -36,4 +36,9 @@
             <if test="count!=null">`count` = #{count},</if>
         </where>
     </select>
+    <select id="page" resultType="com.quping.entry.Rating">
+        SELECT id,image_url,score,title,`text`,`count`,`create_by`
+        FROM rating
+        LIMIT #{offset},#{pageSize};
+    </select>
 </mapper>
