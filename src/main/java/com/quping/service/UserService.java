@@ -6,7 +6,6 @@ import com.quping.dto.UserDTO;
 import com.quping.entry.User;
 
 public interface UserService {
-    Result<?> getCode(String phoneNumber);
 
     Result<String> doLogin(UserDTO userDTO);
 
@@ -15,4 +14,8 @@ public interface UserService {
     Result<User> showProfile();
 
     Result<Void> loginOut();
+
+    Result<?> getCodeByPhone(String phone);
+
+    Result<?> getCodeByEmail(String email);
 }

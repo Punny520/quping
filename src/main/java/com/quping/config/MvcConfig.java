@@ -22,7 +22,8 @@ public class MvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(new TokenInterceptor(stringRedisTemplate))
                 .addPathPatterns("/**")
                 .excludePathPatterns(
-                        "/user/getCode",
+                        "/user/getCodeByPhone",
+                        "/user/getCodeByEmail",
                         "/user/doLogin",
                         "/user/add",
                         "/rating/add",

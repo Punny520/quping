@@ -1,13 +1,13 @@
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/quping?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://127.0.0.1:3306/quping?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
-    password:
+    password: 123456
   redis:
-    host: 127.0.0.1
+    host: 192.168.47.130
     port: 6379
-    password:
+    password: 123456
   mail:
     # 配置 SMTP 服务器地址
     host: smtp.qq.com

@@ -37,7 +37,7 @@ public class TestController {
             while((num--)>0){
                 String phoneNumber = getRandomPhoneNumber();
                 //TODO 有问题待修改
-                String code = (String) userService.getCode(phoneNumber).getData();
+                String code = (String) userService.getCodeByPhone(phoneNumber).getData();
                 UserDTO userDTO = new UserDTO();
                 userDTO.setCode(code);
                 userDTO.setPhoneNumber(phoneNumber);

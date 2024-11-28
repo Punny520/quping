@@ -21,14 +21,23 @@ public class UserController {
         this.userService = userService;
     }
     /**
-     * 根据手机号或者邮箱获取验证码
-     * @param phoneOrMail
+     * 获取手机验证码
+     * @param phone
      * @return
      */
-    @GetMapping("/getCode")
-    public Result<?> code(@RequestParam("phoneOrMail") String phoneOrMail){
-        //TODO 验证手机号或者邮箱
-        return userService.getCode(phoneOrMail);
+    @GetMapping("/getCodeByPhone")
+    public Result<?> getCodeByPhone(@RequestParam("phoneNumber") String phone){
+        return userService.getCodeByPhone(phone);
+    }
+
+    /**
+     * 获取邮箱验证码
+     * @param email
+     * @return
+     */
+    @GetMapping("/getCodeByEmail")
+    public Result<?> getCodeByEmail(@RequestParam("email") String email){
+        return userService.getCodeByEmail(email);
     }
 
     /**

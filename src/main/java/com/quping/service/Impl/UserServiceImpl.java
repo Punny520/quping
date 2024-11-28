@@ -36,28 +36,6 @@ public class UserServiceImpl implements UserService {
     UserMapper userMapper;
     @Autowired
     MailService mailService;
-    /**
-     * 获取登录验证码
-     * @param phoneOrMail 传入手机或者邮箱
-     */
-    @Override
-    public Result<?> getCode(String phoneOrMail) {
-        String code = RandomUtil.randomNumbers(6);
-        //构造key存入Redis中设置5分钟过期
-        String loginKey = Constants.VERIFICATION_CODE_PREFIX + phoneOrMail;
-        Boolean status = redisTemplate.opsForValue().setIfAbsent(loginKey,code,5, TimeUnit.MINUTES);
-        if(Boolean.FALSE.equals(status)){
-            return Result.fail("发送验证码失败，请勿频繁请求！");
-        }
-        //TODO 验证码发送
-        if(Validator.isEmail(phoneOrMail)){
-            String msg = String.format("验证码为：%s 5分钟内有效",code);
-            mailService.sendTo(phoneOrMail,msg);
-        }else{
-            log.info("验证码为：{} 5分钟内有效",code);
-        }
-        return Result.ok(phoneOrMail);
-    }
 
     /**
      * 用户验登录
@@ -84,7 +62,7 @@ public class UserServiceImpl implements UserService {
 
         String code = redisTemplate.opsForValue().get(loginKey);
         if(!userDTO.getCode().equals(code)){
-            return Result.failWithMsg("验证码错误");
+            return Result.failWithMsg("验证码错误或已过期");
         }
         User user = new User();
         BeanUtil.copyProperties(userDTO,user);
@@ -134,7 +112,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         BeanUtil.copyProperties(userDTO,user);
         List<User> userList = userMapper.getUser(user);
-        if(userList==null||userList.size()==0){
+        if(userList==null||userList.isEmpty()){
             return Result.failWithMsg("账号或密码错误");
         }
         return Result.ok(getUserToken(userList.get(0)));
@@ -178,5 +156,44 @@ public class UserServiceImpl implements UserService {
         }
         redisTemplate.delete(idTokenKey);
         return Result.ok();
+    }
+
+    @Override
+    public Result<?> getCodeByPhone(String phone) {
+        String code = RandomUtil.randomNumbers(6);
+        Boolean status = buildKey(phone,code,1L,TimeUnit.MINUTES);
+        if(Boolean.FALSE.equals(status)){
+            return Result.fail("发送验证码失败，请勿频繁请求！");
+        }
+        //TODO 验证码发送
+        log.info("验证码为：{} 1分钟内有效",code);
+        return Result.ok(phone);
+    }
+
+    @Override
+    public Result<?> getCodeByEmail(String email) {
+        String code = RandomUtil.randomNumbers(6);
+        Boolean status = buildKey(email,code,1L,TimeUnit.MINUTES);
+        if(Boolean.FALSE.equals(status)){
+            return Result.fail("发送验证码失败，请勿频繁请求！");
+        }
+        if(Validator.isEmail(email)){
+            String msg = String.format("验证码为：%s 1分钟内有效",code);
+            mailService.sendTo(email,msg);
+        }
+        log.info("From email: 验证码为：{} 1分钟内有效",code);
+        return Result.ok(email);
+    }
+
+    /**
+     * 构造登录验证码key方法
+     * @param key
+     * @param time
+     * @param unit
+     * @return
+     */
+    private Boolean buildKey(String key,String code,Long time,TimeUnit unit){
+        String loginKey = Constants.VERIFICATION_CODE_PREFIX + key;
+        return redisTemplate.opsForValue().setIfAbsent(loginKey,code,time, unit);
     }
 }
