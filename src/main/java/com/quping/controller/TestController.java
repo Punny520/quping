@@ -6,10 +6,12 @@ import cn.hutool.json.JSONUtil;
 import com.quping.common.Result;
 import com.quping.dto.UserDTO;
 import com.quping.dto.UserRatingMappingDTO;
+import com.quping.service.FileService;
 import com.quping.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -114,5 +116,12 @@ public class TestController {
         String jsonStr = JSONUtil.toJsonStr(urmDTO);
         log.info("生成随机JSON:{}",jsonStr);
         return jsonStr;
+    }
+    @Autowired
+    private FileService fileService;
+
+    @PutMapping("/upload")
+    public Result upload(@RequestParam("file") MultipartFile file){
+        return fileService.upload(file);
     }
 }
