@@ -10,6 +10,7 @@ import com.quping.service.RatingService;
 import com.quping.utils.UserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class RatingController {
      * @return
      */
     @PostMapping("/create")
-    public Result<Void> createRating(@RequestBody RatingDTO ratingDTO){
+    public Result<Void> createRating(@ModelAttribute RatingDTO ratingDTO){
         //TODO 参数验证
         return ratingService.create(ratingDTO);
     }

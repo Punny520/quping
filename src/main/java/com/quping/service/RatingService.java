@@ -7,6 +7,7 @@ import com.quping.dto.RatingDTO;
 import com.quping.dto.UserRatingMappingDTO;
 import com.quping.entry.Rating;
 import com.quping.entry.UserRatingMapping;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 

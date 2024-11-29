@@ -11,12 +11,14 @@ import com.quping.entry.Rating;
 import com.quping.dao.mapper.RatingMapper;
 import com.quping.entry.User;
 import com.quping.entry.UserRatingMapping;
+import com.quping.service.FileService;
 import com.quping.service.RatingService;
 import com.quping.utils.RedisUtil;
 import com.quping.utils.UserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,11 +33,16 @@ public class RatingServiceImpl implements RatingService {
     private final RatingMapper ratingMapper;
     private final UserRatingMapper userRatingMapper;
     private final StringRedisTemplate stringRedisTemplate;
+    private final FileService fileService;
     @Autowired
-    RatingServiceImpl(RatingMapper ratingMapper, UserRatingMapper userRatingMapper, StringRedisTemplate stringRedisTemplate){
+    RatingServiceImpl(RatingMapper ratingMapper,
+                      UserRatingMapper userRatingMapper,
+                      StringRedisTemplate stringRedisTemplate,
+                      FileService fileService){
         this.ratingMapper = ratingMapper;
         this.userRatingMapper = userRatingMapper;
         this.stringRedisTemplate =stringRedisTemplate;
+        this.fileService = fileService;
     }
     /**
      * 插入新评分
@@ -126,6 +133,7 @@ public class RatingServiceImpl implements RatingService {
 
     /**
      * 用户创建新评分
+     *
      * @param ratingDTO
      * @return
      */
@@ -135,6 +143,7 @@ public class RatingServiceImpl implements RatingService {
         BeanUtil.copyProperties(ratingDTO,rating);
         User user = UserHolder.getUserSession();
         rating.setCreateBy(user.getId());
+        rating.setImageUrl(fileService.upload(ratingDTO.getImage()));
         return ratingMapper.insert(rating) > 0 ? Result.ok():Result.fail();
     }
 

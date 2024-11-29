@@ -121,7 +121,7 @@ public class TestController {
     private FileService fileService;
 
     @PutMapping("/upload")
-    public Result upload(@RequestParam("file") MultipartFile file){
+    public String upload(@RequestParam("file") MultipartFile file){
         return fileService.upload(file);
     }
 }

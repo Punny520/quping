@@ -22,6 +22,9 @@ public class MinioFileServiceImpl implements FileService {
     @Value("${minio.bucket}")
     private String bucketName;
 
+    @Value("${minio.endpoint}")
+    private String URL;
+
     private final MinioClient minioClient;
 
     @Autowired
@@ -31,19 +34,19 @@ public class MinioFileServiceImpl implements FileService {
 
     @Override
     @SneakyThrows
-    public Result upload(MultipartFile file){
+    public String upload(MultipartFile file){
         if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build())) {
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
         }
-
+        String standardName = getFileName(file);
         PutObjectArgs args = PutObjectArgs.builder()
                 .bucket(bucketName)
-                .object(getFileName(file))
+                .object(standardName)
                 .stream(file.getInputStream(), file.getSize(), -1)
                 .contentType(file.getContentType())
                 .build();
         minioClient.putObject(args);
-        return Result.ok();
+        return String.format("%s/%s/%s",URL,bucketName,standardName);
     }
     private String getFileName(MultipartFile file){
         String oldName = file.getOriginalFilename();

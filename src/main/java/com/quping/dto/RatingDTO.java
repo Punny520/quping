@@ -3,6 +3,7 @@ package com.quping.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @description: 评分类DTO
@@ -46,4 +47,9 @@ public class RatingDTO {
      * 创建人
      */
     private Integer createBy;
+
+    /**
+     * 图片文件
+     */
+    private MultipartFile image;
 }
