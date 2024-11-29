@@ -22,4 +22,6 @@ public interface RatingMapper {
     Rating getByEntry(Rating rating);
 
     List<Rating> page(PageInfo pageInfo);
+
+    Integer count();
 }

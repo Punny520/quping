@@ -157,4 +157,9 @@ public class RatingServiceImpl implements RatingService {
         }).collect(Collectors.toList());
         return Result.page(ratingDTOList,pageInfo);
     }
+
+    @Override
+    public Integer getTotal() {
+        return ratingMapper.count();
+    }
 }

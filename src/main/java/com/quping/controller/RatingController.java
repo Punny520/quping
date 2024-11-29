@@ -101,4 +101,13 @@ public class RatingController {
     public Result<List<RatingDTO>> page(@RequestBody PageInfo pageInfo){
         return ratingService.page(pageInfo);
     }
+
+    /**
+     * 获取总条数，便于分页
+     * @return
+     */
+    @GetMapping("/total")
+    public Integer total(){
+        return ratingService.getTotal();
+    }
 }
