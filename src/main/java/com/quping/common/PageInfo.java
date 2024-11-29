@@ -46,5 +46,6 @@ public class PageInfo {
         log.info("set pageSize:{}",pageSize);
         if(pageSize <= 0) pageSize = 10;
         this.pageSize = pageSize;
+        setOffset();
     }
 }
