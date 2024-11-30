@@ -16,6 +16,7 @@
             <if test="title!=null">title = #{title},</if>
             <if test="text!=null">`text` = #{text},</if>
             <if test="count!=null">`count` = #{count},</if>
+            <if test="createBy!=null">createBy = #{createBy}</if>
         </set>
         WHERE id = #{id};
     </update>
