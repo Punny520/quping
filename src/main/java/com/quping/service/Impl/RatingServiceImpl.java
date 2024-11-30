@@ -144,6 +144,8 @@ public class RatingServiceImpl implements RatingService {
         User user = UserHolder.getUserSession();
         rating.setCreateBy(user.getId());
         rating.setImageUrl(fileService.upload(ratingDTO.getImage()));
+        rating.setScore(0f);
+        rating.setCount(0);
         return ratingMapper.insert(rating) > 0 ? Result.ok():Result.fail();
     }
 
