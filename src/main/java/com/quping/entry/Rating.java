@@ -1,5 +1,7 @@
 package com.quping.entry;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +21,7 @@ public class Rating {
     /**
      * id
      */
+    @TableId(type = IdType.AUTO)
     private Integer id;
     /**
      * 图片链接

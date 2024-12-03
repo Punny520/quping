@@ -6,6 +6,8 @@ import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.quping.common.Constants;
 import com.quping.common.Result;
 import com.quping.dto.UserDTO;
@@ -64,17 +66,20 @@ public class UserServiceImpl implements UserService {
         if(!userDTO.getCode().equals(code)){
             return Result.failWithMsg("验证码错误或已过期");
         }
-        User user = new User();
-        BeanUtil.copyProperties(userDTO,user);
-        List<User> userList = userMapper.getUser(user);
-        if(userList!=null&&userList.size()>0){
-            return Result.ok(getUserToken(userList.get(0)));
+        QueryWrapper<User> userWrapper = new QueryWrapper<>();
+        userWrapper.eq("phone_number",userDTO.getPhoneNumber());
+        User user = userMapper.selectOne(userWrapper);
+        if(user!=null){
+            return Result.ok(getUserToken(user));
+        }else{
+            //创建新用户设置默认值
+            User newUser = new User();
+            BeanUtil.copyProperties(userDTO,newUser);
+            newUser.setPassword("123456");
+            newUser.setNickName(RandomUtil.randomString(10));
+            userMapper.insert(newUser);
+            return Result.ok(getUserToken(newUser));
         }
-        //注册用户，设置默认值
-        user.setPassword("123456");
-        user.setNickName(RandomUtil.randomString(10));
-        userMapper.insertUser(user);
-        return Result.ok(getUserToken(user));
     }
 
     /**
@@ -196,4 +201,9 @@ public class UserServiceImpl implements UserService {
         String loginKey = Constants.VERIFICATION_CODE_PREFIX + key;
         return redisTemplate.opsForValue().setIfAbsent(loginKey,code,time, unit);
     }
+
+//    private User createDefaultNewUser(){
+//        User user = new User();
+//
+//    }
 }
