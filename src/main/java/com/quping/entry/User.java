@@ -1,8 +1,11 @@
 package com.quping.entry;
 
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
 
 /**
  * @description: 用户实体类
@@ -33,5 +36,13 @@ public class User {
      * 邮箱
      */
     private String email;
+
+    /**
+     * 公共字段
+     */
+    private Date createTime;
+    private Date updateTime;
+    @TableLogic
+    private Boolean deleted;
 
 }

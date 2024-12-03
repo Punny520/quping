@@ -1,8 +1,11 @@
 package com.quping.entry;
 
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
 
 /**
  * @description: 用户和评分关联表
@@ -17,4 +20,12 @@ public class UserRatingMapping {
     private Integer userId;
     private Integer ratingId;
     private Integer score;
+
+    /**
+     * 公共字段
+     */
+    private Date createTime;
+    private Date updateTime;
+    @TableLogic
+    private Boolean deleted;
 }
