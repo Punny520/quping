@@ -174,12 +174,26 @@ public class RatingServiceImpl implements RatingService {
     }
 
     /**
-     * 缓存的形式获取评分
+     * 根据id获取评分详情，以及当前用户的评分
      * @param id
      * @return
      */
     @Override
     public Result<RatingDTO> showById(Integer id) {
-        return null;
+        Rating rating = ratingMapper.selectById(id);
+        if(rating == null) return Result.fail();
+        RatingDTO ratingDTO = new RatingDTO();
+        BeanUtil.copyProperties(rating,ratingDTO);
+        User user = UserHolder.getUserSession();
+        if(user != null){
+            UserRatingMapping userRatingMapping = userRatingMapper
+                    .selectOne(new QueryWrapper<UserRatingMapping>()
+                            .eq("user_id", user.getId())
+                            .eq("rating_id", rating.getId()));
+            if(userRatingMapping != null){
+                ratingDTO.setMyScore(userRatingMapping.getScore());
+            }
+        }
+        return Result.ok(ratingDTO);
     }
 }

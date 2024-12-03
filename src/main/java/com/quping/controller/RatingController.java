@@ -57,14 +57,6 @@ public class RatingController {
     @GetMapping("/show/{id}")
     public Result<RatingDTO> getRating(@PathVariable Integer id){
         return ratingService.showById(id);
-        RatingDTO ratingDTO = new RatingDTO();
-        BeanUtil.copyProperties(ratingService.getById(id),ratingDTO);
-        User user = UserHolder.getUserSession();
-        if(user!=null){
-            UserRatingMappingDTO userRatingMappingDTO = getUserRating(user.getId(),id).getData();
-            if(userRatingMappingDTO != null) ratingDTO.setMyScore(userRatingMappingDTO.getScore());
-        }
-        return Result.ok(ratingDTO);
     }
 
     /**
