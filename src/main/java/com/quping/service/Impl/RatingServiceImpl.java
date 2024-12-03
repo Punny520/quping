@@ -91,7 +91,7 @@ public class RatingServiceImpl implements RatingService {
             entry = new UserRatingMapping();
             BeanUtil.copyProperties(urmd,entry);
             userRatingMapper.insert(entry);
-            /**
+            /*
              * talScore/count = oldScore => talScore = oldScore*count
              * newScore = (talScore+newUScore)/(count+1) => (oldScore*count+newUScore)/(count+1)
              */
@@ -103,7 +103,7 @@ public class RatingServiceImpl implements RatingService {
             rating.setCount(rating.getCount()+1);
         }else{
             //用户修改评分
-            /**
+            /*
              * talScore/count = oldScore => talScore = oldScore*count
              * newScore = (talScore - oldUScore + newUScore)/count =>
              * newScore = (oldScore*count - oldUScore + newUScore)/count
