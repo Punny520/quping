@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public Result<String> doLogin(UserDTO userDTO) {
-        if(userDTO.getPassword() != null && !userDTO.getPassword().equals("")){
+        if(!StrUtil.isEmpty(userDTO.getPassword())){
             return doLoginByPassword(userDTO);
         }else return doLoginByCode(userDTO);
     }
@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     private Result<String> doLoginByCode(UserDTO userDTO) {
-        String loginKey = null;
+        String loginKey;
         if(!StrUtil.isBlank(userDTO.getPhoneNumber())){
             loginKey = Constants.VERIFICATION_CODE_PREFIX + userDTO.getPhoneNumber();
         }else loginKey = Constants.VERIFICATION_CODE_PREFIX + userDTO.getEmail();
@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     private String getUserToken(User user){
-        String token = null;
+        String token;
         String idTokenKey = Constants.USER_LOGIN_TOKEN+user.getId();
         Boolean keyExists = redisTemplate.hasKey(idTokenKey);
         if(Boolean.TRUE.equals(keyExists)){
@@ -114,13 +114,13 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     private Result<String> doLoginByPassword(UserDTO userDTO) {
-        User user = new User();
-        BeanUtil.copyProperties(userDTO,user);
-        List<User> userList = userMapper.getUser(user);
-        if(userList==null||userList.isEmpty()){
+        User user = userMapper.selectOne(new QueryWrapper<User>()
+                .eq("phone_number",userDTO.getPhoneNumber())
+                .eq("password",userDTO.getPassword()));
+        if(user == null){
             return Result.failWithMsg("账号或密码错误");
         }
-        return Result.ok(getUserToken(userList.get(0)));
+        return Result.ok(getUserToken(user));
     }
 
     /**
