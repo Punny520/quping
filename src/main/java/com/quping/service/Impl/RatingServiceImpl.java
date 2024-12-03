@@ -1,6 +1,9 @@
 package com.quping.service.Impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.quping.common.Constants;
 import com.quping.common.PageInfo;
 import com.quping.common.Result;
@@ -53,8 +56,8 @@ public class RatingServiceImpl implements RatingService {
     public Result<Void> insert(RatingDTO ratingDTO) {
         Rating rating = new Rating();
         BeanUtil.copyProperties(ratingDTO,rating);
-        ratingMapper.insert(rating);
-        return Result.ok();
+        int res = ratingMapper.insert(rating);
+        return res == 0 ? Result.fail() : Result.ok();
     }
 
     /**
@@ -79,20 +82,22 @@ public class RatingServiceImpl implements RatingService {
     public synchronized Result<Void> doRating(UserRatingMappingDTO urmd) {
         Rating rating = getById(urmd.getRatingId());
         if(rating == null) return Result.fail();
-        UserRatingMapping urm = new UserRatingMapping();
-        BeanUtil.copyProperties(urmd,urm);
-        UserRatingMapping entry = userRatingMapper.getByEntry(urm);
+        UserRatingMapping entry = userRatingMapper.selectOne(new QueryWrapper<UserRatingMapping>()
+                .eq("user_id",urmd.getUserId())
+                .eq("rating_id",urmd.getRatingId()));
         int res = 0;
         if(entry == null){
             //新增用户评分
-            userRatingMapper.insert(urm);
+            entry = new UserRatingMapping();
+            BeanUtil.copyProperties(urmd,entry);
+            userRatingMapper.insert(entry);
             /**
              * talScore/count = oldScore => talScore = oldScore*count
              * newScore = (talScore+newUScore)/(count+1) => (oldScore*count+newUScore)/(count+1)
              */
             float oldScore = rating.getScore();
             float count = rating.getCount();
-            float newUScore = urm.getScore();
+            float newUScore = urmd.getScore();
             float newScore = (oldScore*count+newUScore)/(count+1);
             rating.setScore(newScore);
             rating.setCount(rating.getCount()+1);
@@ -106,14 +111,14 @@ public class RatingServiceImpl implements RatingService {
             float oldScore = rating.getScore();
             float count = rating.getCount();
             float oldUScore = entry.getScore();
-            float newUScore = urm.getScore();
+            float newUScore = urmd.getScore();
             float newScore = (oldScore*count-oldUScore+newUScore)/count;
             rating.setScore(newScore);
-            entry.setScore(urm.getScore());
-            userRatingMapper.update(entry);
+            entry.setScore(urmd.getScore());
+            userRatingMapper.updateById(entry);
         }
         stringRedisTemplate.delete(Constants.RATING_CACHE_PREFIX+rating.getId());
-        res = ratingMapper.update(rating);
+        res = ratingMapper.updateById(rating);
         return res>0?Result.ok():Result.fail();
     }
 
@@ -151,8 +156,11 @@ public class RatingServiceImpl implements RatingService {
 
     @Override
     public Result<List<RatingDTO>> page(PageInfo pageInfo) {
-        List<Rating> ratingList = ratingMapper.page(pageInfo);
-        List<RatingDTO> ratingDTOList = ratingList.stream().map(e -> {
+        Page<Rating> page = new Page<>(pageInfo.getPageNumber(),pageInfo.getPageSize());
+        List<RatingDTO> ratingDTOList = ratingMapper
+                .selectPage(page,null)
+                .getRecords()
+                .stream().map(e -> {
             RatingDTO ratingDTO = new RatingDTO();
             BeanUtil.copyProperties(e, ratingDTO);
             return ratingDTO;
@@ -161,7 +169,17 @@ public class RatingServiceImpl implements RatingService {
     }
 
     @Override
-    public Integer getTotal() {
-        return ratingMapper.count();
+    public Long getTotal() {
+        return ratingMapper.selectCount(null);
+    }
+
+    /**
+     * 缓存的形式获取评分
+     * @param id
+     * @return
+     */
+    @Override
+    public Result<RatingDTO> showById(Integer id) {
+        return null;
     }
 }

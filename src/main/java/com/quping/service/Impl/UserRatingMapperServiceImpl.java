@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class UserRatingMapperServiceImpl implements UserRatingMapperService {
-    private UserRatingMapper userRatingMapper;
+    private final UserRatingMapper userRatingMapper;
     @Autowired
     UserRatingMapperServiceImpl(UserRatingMapper userRatingMapper){
         this.userRatingMapper = userRatingMapper;

@@ -23,6 +23,7 @@ public interface RatingService {
 
     Result<List<RatingDTO>> page(PageInfo pageInfo);
 
-    Integer getTotal();
+    Long getTotal();
 
+    Result<RatingDTO> showById(Integer id);
 }

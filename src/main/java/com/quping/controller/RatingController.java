@@ -55,7 +55,8 @@ public class RatingController {
      * @return
      */
     @GetMapping("/show/{id}")
-    public Result<RatingDTO> getRating(@PathVariable int id){
+    public Result<RatingDTO> getRating(@PathVariable Integer id){
+        return ratingService.showById(id);
         RatingDTO ratingDTO = new RatingDTO();
         BeanUtil.copyProperties(ratingService.getById(id),ratingDTO);
         User user = UserHolder.getUserSession();
@@ -107,7 +108,7 @@ public class RatingController {
      * @return
      */
     @GetMapping("/total")
-    public Integer total(){
+    public Long total(){
         return ratingService.getTotal();
     }
 }

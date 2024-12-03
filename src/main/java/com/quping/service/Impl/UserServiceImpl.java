@@ -132,7 +132,7 @@ public class UserServiceImpl implements UserService {
     public Result<?> addUser(UserDTO userDTO) {
         User user = new User();
         BeanUtil.copyProperties(userDTO,user);
-        int result = userMapper.insertUser(user);
+        int result = userMapper.insert(user);
         return result != 1?Result.failWithMsg("添加用户失败"):Result.ok();
     }
 

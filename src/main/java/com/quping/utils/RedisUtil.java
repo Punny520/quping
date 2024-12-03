@@ -35,7 +35,7 @@ public class RedisUtil {
                 stringRedisTemplate.opsForValue().set(key,"");
                 return null;
             }else return entry;
-        }else if(JSON.equals("")){
+        }else if(JSON.isEmpty()){
             return null;
         }
         entry = JSONUtil.toBean(JSON,clzz);
@@ -53,7 +53,7 @@ public class RedisUtil {
         //TODO 使用Redisson分布式锁
         String JSON = stringRedisTemplate.opsForValue().get(key);
         if(JSON!=null){
-            if(JSON.equals("")) return null;//防止缓存穿透
+            if(JSON.isEmpty()) return null;//防止缓存穿透
             return JSONUtil.toBean(JSON,clzz);
         }else {
             entry = getByEntry.apply(entry);
