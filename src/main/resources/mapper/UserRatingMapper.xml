@@ -4,15 +4,6 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.quping.dao.mapper.UserRatingMapper">
 
-    <insert id="insert">
-        INSERT INTO user_rating_mapping (id, user_id, rating_id, score)
-        VALUES (null,#{userId},#{ratingId},#{score});
-    </insert>
-    <update id="update">
-        UPDATE user_rating_mapping
-        SET score = #{score}
-        WHERE user_id = #{userId} AND rating_id = #{ratingId};
-    </update>
     <select id="getByEntry" resultType="com.quping.entry.UserRatingMapping">
         SELECT id,user_id,rating_id,score
         FROM user_rating_mapping

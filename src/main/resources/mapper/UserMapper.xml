@@ -3,37 +3,4 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.quping.dao.mapper.UserMapper">
-    <select id="getUser" resultType="com.quping.entry.User">
-        SELECT
-            user.id,
-            user.nick_name,
-            user.phone_number,
-            user.password,
-            user.email
-        FROM user
-        WHERE
-            1 = 1
-            <if test="id != null">
-                AND user.id = #{id}
-            </if>
-            <if test="phoneNumber != null">
-                AND user.phone_number = #{phoneNumber}
-            </if>
-            <if test="nickName != null">
-                AND user.nick_name = #{nickName}
-            </if>
-            <if test="password != null">
-                AND user.password = #{password}
-            </if>
-            <if test="email != null">
-                AND user.email = #{email}
-            </if>
-    </select>
-    <select id="getUserByPhoneNumber" resultType="com.quping.entry.User">
-        SELECT * FROM user WHERE phone_number = #{phoneNumber}
-    </select>
-    <insert id="insertUser" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO user (id, nick_name, phone_number, password, email)
-        VALUES (null,#{nickName},#{phoneNumber},#{password},#{email});
-    </insert>
 </mapper>

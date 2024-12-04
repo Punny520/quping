@@ -3,28 +3,6 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.quping.dao.mapper.RatingMapper">
-
-    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO rating (id, image_url, score, title, `text`, `count`, `create_by`)
-                    VALUES (null,#{imageUrl},#{score},#{title},#{text},#{count},#{createBy});
-    </insert>
-    <update id="update">
-        UPDATE rating
-        <set>
-            <if test="imageUrl!=null">image_url = #{imageUrl},</if>
-            <if test="score!=null">score = #{score},</if>
-            <if test="title!=null">title = #{title},</if>
-            <if test="text!=null">`text` = #{text},</if>
-            <if test="count!=null">`count` = #{count},</if>
-            <if test="createBy!=null">createBy = #{createBy}</if>
-        </set>
-        WHERE id = #{id};
-    </update>
-    <select id="getById" resultType="com.quping.entry.Rating">
-        SELECT id,image_url,score,title,`text`,`count`
-        FROM rating
-        WHERE id = #{id};
-    </select>
     <select id="getByEntry" resultType="com.quping.entry.Rating">
         SELECT id,image_url,score,title,`text`,`count`
         FROM rating
@@ -36,14 +14,5 @@
             <if test="text!=null">`text` = #{text},</if>
             <if test="count!=null">`count` = #{count},</if>
         </where>
-    </select>
-    <select id="page" resultType="com.quping.entry.Rating">
-        SELECT id,image_url,score,title,`text`,`count`,`create_by`
-        FROM rating
-        LIMIT #{offset},#{pageSize};
-    </select>
-    <select id="count" resultType="java.lang.Integer">
-        SELECT COUNT(1)
-        FROM rating
     </select>
 </mapper>
