@@ -66,8 +66,6 @@ public class RatingController {
      */
     @PostMapping("/doRating")
     public Result<Void> doRating(@RequestBody UserRatingMappingDTO urmd){
-        User user = UserHolder.getUserSession();
-        urmd.setUserId(user.getId());
         return ratingService.doRating(urmd);
     }
 

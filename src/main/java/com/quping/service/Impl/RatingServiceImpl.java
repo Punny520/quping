@@ -61,16 +61,14 @@ public class RatingServiceImpl implements RatingService {
     }
 
     /**
-     * 根据id获取评分
+     * 根据id获取评分，走缓存逻辑
      * @param id
      * @return
      */
     @Override
     public Rating getById(int id) {
         String key = Constants.RATING_CACHE_PREFIX + id;
-        Rating entry = new Rating();
-        entry.setId(id);
-        return RedisUtil.getByCache(key,Rating.class,entry,ratingMapper::getByEntry);
+        return RedisUtil.getFromCacheById(key, (long) id,Rating.class,ratingMapper);
     }
 
     /**
@@ -80,8 +78,11 @@ public class RatingServiceImpl implements RatingService {
      */
     @Override
     public synchronized Result<Void> doRating(UserRatingMappingDTO urmd) {
+        User user = UserHolder.getUserSession();
+        if(user == null) return Result.failWithMsg("请登录");
+        urmd.setUserId(user.getId());
         Rating rating = getById(urmd.getRatingId());
-        if(rating == null) return Result.fail();
+        if(rating == null) return Result.failWithMsg("数据不存在");
         UserRatingMapping entry = userRatingMapper.selectOne(new QueryWrapper<UserRatingMapping>()
                 .eq("user_id",urmd.getUserId())
                 .eq("rating_id",urmd.getRatingId()));
@@ -117,8 +118,8 @@ public class RatingServiceImpl implements RatingService {
             entry.setScore(urmd.getScore());
             userRatingMapper.updateById(entry);
         }
+        res = ratingMapper.updateById(rating);//先更新数据库后删除缓存
         stringRedisTemplate.delete(Constants.RATING_CACHE_PREFIX+rating.getId());
-        res = ratingMapper.updateById(rating);
         return res>0?Result.ok():Result.fail();
     }
 
@@ -175,13 +176,14 @@ public class RatingServiceImpl implements RatingService {
 
     /**
      * 根据id获取评分详情，以及当前用户的评分
+     * 走缓存路线
      * @param id
      * @return
      */
     @Override
     public Result<RatingDTO> showById(Integer id) {
-        Rating rating = ratingMapper.selectById(id);
-        if(rating == null) return Result.fail();
+        Rating rating = getById(id);
+        if(rating == null) return Result.failWithMsg("数据不存在");
         RatingDTO ratingDTO = new RatingDTO();
         BeanUtil.copyProperties(rating,ratingDTO);
         User user = UserHolder.getUserSession();

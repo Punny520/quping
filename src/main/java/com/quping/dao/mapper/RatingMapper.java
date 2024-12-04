@@ -14,6 +14,4 @@ import java.util.List;
  */
 @Mapper
 public interface RatingMapper extends BaseMapper<Rating> {
-
-    Rating getByEntry(Rating rating);
 }
