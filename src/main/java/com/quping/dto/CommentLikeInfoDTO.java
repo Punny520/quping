@@ -8,10 +8,6 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-/**
- * 
- * @TableName comment_like_info
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
