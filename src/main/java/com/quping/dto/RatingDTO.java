@@ -17,7 +17,7 @@ public class RatingDTO {
     /**
      * id
      */
-    private Integer id;
+    private Long id;
     /**
      * 图片链接
      */
@@ -46,7 +46,7 @@ public class RatingDTO {
     /**
      * 创建人
      */
-    private Integer createBy;
+    private Long createBy;
 
     /**
      * 图片文件

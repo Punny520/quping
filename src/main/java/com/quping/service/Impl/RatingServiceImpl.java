@@ -66,7 +66,7 @@ public class RatingServiceImpl implements RatingService {
      * @return
      */
     @Override
-    public Rating getById(int id) {
+    public Rating getById(long id) {
         String key = Constants.RATING_CACHE_PREFIX + id;
         return RedisUtil.getFromCacheById(key, (long) id,Rating.class,ratingMapper);
     }
@@ -130,7 +130,7 @@ public class RatingServiceImpl implements RatingService {
      * @return
      */
     @Override
-    public UserRatingMapping getUserRating(Integer userId, Integer ratingId) {
+    public UserRatingMapping getUserRating(Long userId, Long ratingId) {
         UserRatingMapping userRatingMapping = new UserRatingMapping();
         userRatingMapping.setUserId(userId);
         userRatingMapping.setRatingId(ratingId);
@@ -181,7 +181,7 @@ public class RatingServiceImpl implements RatingService {
      * @return
      */
     @Override
-    public Result<RatingDTO> showById(Integer id) {
+    public Result<RatingDTO> showById(Long id) {
         Rating rating = getById(id);
         if(rating == null) return Result.failWithMsg("数据不存在");
         RatingDTO ratingDTO = new RatingDTO();

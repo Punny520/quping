@@ -3,8 +3,6 @@ package com.quping.entry;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,7 +20,7 @@ public class Comment implements Serializable {
     * 主键
     */
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private Long id;
     /**
     * 内容
     */
@@ -31,6 +29,7 @@ public class Comment implements Serializable {
     * 点赞数量
     */
     private Integer likeCount;
+
 
     /**
      * 公共字段

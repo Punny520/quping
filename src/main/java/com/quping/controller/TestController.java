@@ -110,7 +110,7 @@ public class TestController {
      */
     private String randomPostBody(){
         UserRatingMappingDTO urmDTO = new UserRatingMappingDTO();
-        urmDTO.setRatingId(9);
+        urmDTO.setRatingId(9L);
         Integer score = RandomUtil.randomInt(1,6);
         urmDTO.setScore(score);
         String jsonStr = JSONUtil.toJsonStr(urmDTO);

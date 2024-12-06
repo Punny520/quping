@@ -16,7 +16,7 @@ public class UserDTO {
     /**
      * id
      */
-    private Integer id;
+    private Long id;
     /**
      * 昵称
      */

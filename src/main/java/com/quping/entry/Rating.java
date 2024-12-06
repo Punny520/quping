@@ -21,7 +21,7 @@ public class Rating {
      * id
      */
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private Long id;
     /**
      * 图片链接
      */
@@ -46,7 +46,7 @@ public class Rating {
     /**
      * 创建人
      */
-    private Integer createBy;
+    private Long createBy;
 
     /**
      * 公共字段

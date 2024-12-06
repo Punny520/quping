@@ -13,11 +13,11 @@ import java.util.List;
 public interface RatingService {
     Result<Void> insert(RatingDTO ratingDTO);
 
-    Rating getById(int id);
+    Rating getById(long id);
 
     Result<Void> doRating(UserRatingMappingDTO urmd);
 
-    UserRatingMapping getUserRating(Integer userId, Integer ratingId);
+    UserRatingMapping getUserRating(Long userId, Long ratingId);
 
     Result<Void> create(RatingDTO ratingDTO);
 
@@ -25,5 +25,5 @@ public interface RatingService {
 
     Long getTotal();
 
-    Result<RatingDTO> showById(Integer id);
+    Result<RatingDTO> showById(Long id);
 }

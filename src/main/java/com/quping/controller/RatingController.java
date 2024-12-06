@@ -55,7 +55,7 @@ public class RatingController {
      * @return
      */
     @GetMapping("/show/{id}")
-    public Result<RatingDTO> getRating(@PathVariable Integer id){
+    public Result<RatingDTO> getRating(@PathVariable Long id){
         return ratingService.showById(id);
     }
 
@@ -76,8 +76,8 @@ public class RatingController {
      * @return
      */
     @GetMapping("/show/{userId}/{ratingId}")
-    public Result<UserRatingMappingDTO> getUserRating(@PathVariable("userId") Integer userId,
-                                @PathVariable("ratingId") Integer ratingId){
+    public Result<UserRatingMappingDTO> getUserRating(@PathVariable("userId") Long userId,
+                                @PathVariable("ratingId") Long ratingId){
         UserRatingMappingDTO userRatingMappingDTO = new UserRatingMappingDTO();
         BeanUtil.copyProperties(ratingService.getUserRating(userId,ratingId),userRatingMappingDTO);
         return Result.ok(userRatingMappingDTO);
