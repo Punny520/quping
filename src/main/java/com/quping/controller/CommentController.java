@@ -38,4 +38,14 @@ public class CommentController {
     public Result<List<CommentDTO>> listComment(@PathVariable Long ratingId) {
         return commentService.listByRatingId(ratingId);
     }
+
+    /**
+     * 点赞评论
+     * @param commentId
+     * @return
+     */
+    @GetMapping("/like/{commentId}")
+    public Result<String> likeComment(@PathVariable Long commentId) {
+        return commentService.likeComment(commentId);
+    }
 }

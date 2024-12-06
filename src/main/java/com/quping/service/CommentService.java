@@ -9,4 +9,6 @@ public interface CommentService {
     Result<String> post(CommentDTO commentDTO);
 
     Result<List<CommentDTO>> listByRatingId(Long ratingId);
+
+    Result<String> likeComment(Long commentId);
 }
