@@ -29,6 +29,7 @@ public class MvcConfig implements WebMvcConfigurer {
                         "/rating/add",
                         "/rating/total",
                         "/rating/page",
-                        "/test/**");
+                        "/test/**",
+                        "/comment/list/**");
     }
 }
