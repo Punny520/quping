@@ -3,7 +3,7 @@ package com.quping.interceptor;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.quping.common.Constants;
-import com.quping.entry.User;
+import com.quping.entity.User;
 import com.quping.utils.UserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;

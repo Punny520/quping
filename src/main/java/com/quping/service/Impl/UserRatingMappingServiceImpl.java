@@ -2,7 +2,7 @@ package com.quping.service.Impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.quping.dao.mapper.UserRatingMapper;
-import com.quping.entry.UserRatingMapping;
+import com.quping.entity.UserRatingMapping;
 import com.quping.service.UserRatingMappingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

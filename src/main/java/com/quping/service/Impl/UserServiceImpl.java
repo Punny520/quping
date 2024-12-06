@@ -6,12 +6,11 @@ import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.quping.common.Constants;
 import com.quping.common.Result;
 import com.quping.dto.UserDTO;
-import com.quping.entry.User;
+import com.quping.entity.User;
 import com.quping.dao.mapper.UserMapper;
 import com.quping.service.MailService;
 import com.quping.service.UserService;
@@ -21,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**

@@ -2,7 +2,7 @@ package com.quping.controller;
 
 import com.quping.common.Result;
 import com.quping.dto.UserDTO;
-import com.quping.entry.User;
+import com.quping.entity.User;
 import com.quping.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

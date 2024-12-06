@@ -5,8 +5,8 @@ import com.quping.common.PageInfo;
 import com.quping.common.Result;
 import com.quping.dto.RatingDTO;
 import com.quping.dto.UserRatingMappingDTO;
-import com.quping.entry.Rating;
-import com.quping.entry.UserRatingMapping;
+import com.quping.entity.Rating;
+import com.quping.entity.UserRatingMapping;
 
 import java.util.List;
 

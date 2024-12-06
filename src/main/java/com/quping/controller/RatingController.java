@@ -5,12 +5,9 @@ import com.quping.common.PageInfo;
 import com.quping.common.Result;
 import com.quping.dto.RatingDTO;
 import com.quping.dto.UserRatingMappingDTO;
-import com.quping.entry.User;
 import com.quping.service.RatingService;
-import com.quping.utils.UserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 

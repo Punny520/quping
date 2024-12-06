@@ -2,7 +2,7 @@ package com.quping.utils;
 
 
 import cn.hutool.json.JSONUtil;
-import com.quping.entry.User;
+import com.quping.entity.User;
 
 /**
  * @description:用户会话存储

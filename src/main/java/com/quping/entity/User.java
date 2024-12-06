@@ -1,35 +1,42 @@
-package com.quping.entry;
+package com.quping.entity;
 
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-/**
-* 
-* @TableName comment
-*/
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Comment implements Serializable {
 
+import java.time.LocalDateTime;
+
+/**
+ * @description: 用户实体类
+ * @author: Punny
+ * @date: 2024/8/25 22:25
+ */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class User {
     /**
-    * 主键
-    */
+     * id
+     */
     @TableId(type = IdType.AUTO)
     private Long id;
     /**
-    * 内容
-    */
-    private String content;
+     * 昵称
+     */
+    private String nickName;
     /**
-    * 点赞数量
-    */
-    private Integer likeCount;
-
+     * 手机号
+     */
+    private String phoneNumber;
+    /**
+     * 密码
+     */
+    private String password;
+    /**
+     * 邮箱
+     */
+    private String email;
 
     /**
      * 公共字段

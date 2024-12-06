@@ -2,7 +2,6 @@ package com.quping.service.Impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.quping.common.Constants;
 import com.quping.common.PageInfo;
@@ -10,10 +9,10 @@ import com.quping.common.Result;
 import com.quping.dao.mapper.UserRatingMapper;
 import com.quping.dto.RatingDTO;
 import com.quping.dto.UserRatingMappingDTO;
-import com.quping.entry.Rating;
+import com.quping.entity.Rating;
 import com.quping.dao.mapper.RatingMapper;
-import com.quping.entry.User;
-import com.quping.entry.UserRatingMapping;
+import com.quping.entity.User;
+import com.quping.entity.UserRatingMapping;
 import com.quping.service.FileService;
 import com.quping.service.RatingService;
 import com.quping.utils.RedisUtil;
@@ -21,7 +20,6 @@ import com.quping.utils.UserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -83,15 +81,15 @@ public class RatingServiceImpl implements RatingService {
         urmd.setUserId(user.getId());
         Rating rating = getById(urmd.getRatingId());
         if(rating == null) return Result.failWithMsg("数据不存在");
-        UserRatingMapping entry = userRatingMapper.selectOne(new QueryWrapper<UserRatingMapping>()
+        UserRatingMapping entity = userRatingMapper.selectOne(new QueryWrapper<UserRatingMapping>()
                 .eq("user_id",urmd.getUserId())
                 .eq("rating_id",urmd.getRatingId()));
         int res = 0;
-        if(entry == null){
+        if(entity == null){
             //新增用户评分
-            entry = new UserRatingMapping();
-            BeanUtil.copyProperties(urmd,entry);
-            userRatingMapper.insert(entry);
+            entity = new UserRatingMapping();
+            BeanUtil.copyProperties(urmd,entity);
+            userRatingMapper.insert(entity);
             /*
              * talScore/count = oldScore => talScore = oldScore*count
              * newScore = (talScore+newUScore)/(count+1) => (oldScore*count+newUScore)/(count+1)
@@ -111,12 +109,12 @@ public class RatingServiceImpl implements RatingService {
              */
             float oldScore = rating.getScore();
             float count = rating.getCount();
-            float oldUScore = entry.getScore();
+            float oldUScore = entity.getScore();
             float newUScore = urmd.getScore();
             float newScore = (oldScore*count-oldUScore+newUScore)/count;
             rating.setScore(newScore);
-            entry.setScore(urmd.getScore());
-            userRatingMapper.updateById(entry);
+            entity.setScore(urmd.getScore());
+            userRatingMapper.updateById(entity);
         }
         res = ratingMapper.updateById(rating);//先更新数据库后删除缓存
         stringRedisTemplate.delete(Constants.RATING_CACHE_PREFIX+rating.getId());
@@ -134,7 +132,7 @@ public class RatingServiceImpl implements RatingService {
         UserRatingMapping userRatingMapping = new UserRatingMapping();
         userRatingMapping.setUserId(userId);
         userRatingMapping.setRatingId(ratingId);
-        return userRatingMapper.getByEntry(userRatingMapping);
+        return userRatingMapper.getByentity(userRatingMapping);
     }
 
     /**

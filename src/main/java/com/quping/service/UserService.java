@@ -3,7 +3,7 @@ package com.quping.service;
 
 import com.quping.common.Result;
 import com.quping.dto.UserDTO;
-import com.quping.entry.User;
+import com.quping.entity.User;
 
 public interface UserService {
 
