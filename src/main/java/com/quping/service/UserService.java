@@ -18,4 +18,8 @@ public interface UserService {
     Result<?> getCodeByPhone(String phone);
 
     Result<?> getCodeByEmail(String email);
+
+    Result<Boolean> checkIfFirstLogin();
+
+    Result<?> firstSetting(UserDTO userDTO);
 }

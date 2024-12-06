@@ -39,6 +39,11 @@ public class User {
     private String email;
 
     /**
+     * 是否第一次登录
+     */
+    private Boolean firstLogin;
+
+    /**
      * 公共字段
      */
     @TableField(fill = FieldFill.INSERT)

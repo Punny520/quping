@@ -74,4 +74,18 @@ public class UserController {
     public Result<Void> loginOut(){
         return userService.loginOut();
     }
+
+    /**
+     * 检查是否第一次登录
+     * @return
+     */
+    @GetMapping("/check")
+    public Result<Boolean> checkIfFirstLogin(){
+        return userService.checkIfFirstLogin();
+    }
+
+    @PostMapping("/firstSetting")
+    public Result<?> firstSetting(@RequestBody UserDTO userDTO){
+        return userService.firstSetting(userDTO);
+    }
 }

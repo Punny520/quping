@@ -75,6 +75,7 @@ public class UserServiceImpl implements UserService {
             BeanUtil.copyProperties(userDTO,newUser);
             newUser.setPassword("123456");
             newUser.setNickName(RandomUtil.randomString(10));
+            newUser.setFirstLogin(true);
             userMapper.insert(newUser);
             return Result.ok(getUserToken(newUser));
         }
@@ -186,6 +187,30 @@ public class UserServiceImpl implements UserService {
         }
         log.info("From email: 验证码为：{} 1分钟内有效",code);
         return Result.ok(email);
+    }
+
+    /**
+     * 检查用户是否第一次登录
+     * @return
+     */
+    @Override
+    public Result<Boolean> checkIfFirstLogin() {
+        User user = UserHolder.getUserSession();
+        if(user == null) return Result.ok(Boolean.FALSE);
+        return Result.ok(user.getFirstLogin());
+    }
+
+    @Override
+    public Result<?> firstSetting(UserDTO userDTO) {
+        User user = UserHolder.getUserSession();
+        if(user == null) return Result.fail();
+        User entity = userMapper.selectById(user.getId());
+        entity.setFirstLogin(false);
+        entity.setNickName(userDTO.getNickName());
+        entity.setPassword(userDTO.getPassword());
+        userMapper.updateById(entity);
+        UserHolder.updateById(entity.getId());
+        return Result.ok();
     }
 
     /**
