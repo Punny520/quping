@@ -1,33 +1,28 @@
-package com.quping.entity;
+package com.quping.dto;
 
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-/**
-* 
-* @TableName comment
-*/
+
+import java.time.LocalDateTime;
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class Comment implements Serializable {
+@NoArgsConstructor
+public class CommentDTO {
 
     /**
-    * 主键
-    */
+     * 主键
+     */
     @TableId(type = IdType.AUTO)
     private Long id;
     /**
-    * 内容
-    */
+     * 内容
+     */
     private String content;
     /**
-    * 点赞数量
-    */
+     * 点赞数量
+     */
     private Integer likeCount;
     /**
      * 用户id
@@ -47,5 +42,4 @@ public class Comment implements Serializable {
     private LocalDateTime updateTime;
     @TableLogic
     private Boolean deleted;
-
 }

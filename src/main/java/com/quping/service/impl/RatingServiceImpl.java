@@ -1,4 +1,4 @@
-package com.quping.service.Impl;
+package com.quping.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;

@@ -1,4 +1,4 @@
-package com.quping.service.Impl;
+package com.quping.service.impl;
 
 import com.quping.service.MailService;
 import org.springframework.beans.factory.annotation.Autowired;

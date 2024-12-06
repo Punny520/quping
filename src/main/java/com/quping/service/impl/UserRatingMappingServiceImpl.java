@@ -1,4 +1,4 @@
-package com.quping.service.Impl;
+package com.quping.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.quping.dao.mapper.UserRatingMapper;

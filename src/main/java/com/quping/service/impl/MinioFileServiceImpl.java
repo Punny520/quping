@@ -1,8 +1,6 @@
-package com.quping.service.Impl;
+package com.quping.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
-import com.quping.common.Result;
 import com.quping.service.FileService;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
