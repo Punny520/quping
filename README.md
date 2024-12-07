@@ -81,3 +81,50 @@ categories:
 > 通过redis中构造key为userID,value为token的键值对来保存用户的登录状态。
 >
 > 在登录后，生成token前，根据用户id去redis中查询一下是否已经有对应用户的token了，如果有则判断该token是否有效，如果有效则直接返回，否则生成新的token并保存在redis后再返回。
+
+### 分页查询设计
+
+> 用于带条件的查询，并且返回分页后的结果
+
+前端传入的数据(现阶段条件只做字符串匹配)
+
+```json
+{
+    "pageNumber": 1,
+    "pageSiez": 20,
+    "condition": "abc"
+}
+```
+
+后端数据类：
+
+```java
+public class PageInfo{
+  /**
+   * 页码
+   */
+  private Integer pageNumber = 1;
+  /**
+   * 每页的数据条数
+   */
+  private Integer pageSize = 10;
+  /**
+   * 查询条件，目前只做字符串匹配
+   */
+  private String condition;
+
+  public void setPageNumber(Integer pageNumber) {
+    this.pageNumber = pageNumber >= 1 ? pageNumber : 1;
+  }
+
+  public void setPageSize(Integer pageSize) {
+    this.pageSize = pageSize >= 1 ? pageSize : 10;
+  }
+}
+```
+```java
+public class PageResult<T>{
+    private Long total = 0L;
+    private List<T> dataList;
+}
+```

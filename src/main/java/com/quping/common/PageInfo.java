@@ -8,44 +8,25 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Data
 @Slf4j
-public class PageInfo {
+public class PageInfo{
     /**
      * 页码
      */
-    private Integer pageNumber;
-
+    private Integer pageNumber = 1;
     /**
      * 每页的数据条数
      */
-    private Integer pageSize;
-
+    private Integer pageSize = 10;
     /**
-     * 偏移量
+     * 查询条件，目前只做字符串匹配
      */
-    private Integer offset;
-
-    PageInfo(){
-        this.pageNumber = 1;
-        this.pageSize = 10;
-        this.offset = 0;
-    }
-
-    public void setOffset(){
-        log.info("set Index");
-        this.offset = (pageNumber - 1) * pageSize;
-    }
+    private String condition;
 
     public void setPageNumber(Integer pageNumber) {
-        log.info("set pageNumber:{}",pageNumber);
-        if(pageNumber <= 0) pageNumber = 1;
-        this.pageNumber = pageNumber;
-        setOffset();
+        this.pageNumber = pageNumber >= 1 ? pageNumber : 1;
     }
 
     public void setPageSize(Integer pageSize) {
-        log.info("set pageSize:{}",pageSize);
-        if(pageSize <= 0) pageSize = 10;
-        this.pageSize = pageSize;
-        setOffset();
+        this.pageSize = pageSize >= 1 ? pageSize : 10;
     }
 }

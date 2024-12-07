@@ -2,6 +2,7 @@ package com.quping.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.quping.common.PageInfo;
+import com.quping.common.PageResult;
 import com.quping.common.Result;
 import com.quping.dto.RatingDTO;
 import com.quping.dto.UserRatingMappingDTO;
@@ -79,23 +80,13 @@ public class RatingController {
         BeanUtil.copyProperties(ratingService.getUserRating(userId,ratingId),userRatingMappingDTO);
         return Result.ok(userRatingMappingDTO);
     }
-
     /**
-     * 分页查询
+     * 条件分页查询
      * @param pageInfo
      * @return
      */
-    @PostMapping("/page")
-    public Result<List<RatingDTO>> page(@RequestBody PageInfo pageInfo){
-        return ratingService.page(pageInfo);
-    }
-
-    /**
-     * 获取总条数，便于分页
-     * @return
-     */
-    @GetMapping("/total")
-    public Long total(){
-        return ratingService.getTotal();
+    @PostMapping("/search")
+    public Result<PageResult<RatingDTO>> search(@RequestBody PageInfo pageInfo){
+        return ratingService.search(pageInfo);
     }
 }

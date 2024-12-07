@@ -2,6 +2,7 @@ package com.quping.service;
 
 
 import com.quping.common.PageInfo;
+import com.quping.common.PageResult;
 import com.quping.common.Result;
 import com.quping.dto.RatingDTO;
 import com.quping.dto.UserRatingMappingDTO;
@@ -21,9 +22,7 @@ public interface RatingService {
 
     Result<Void> create(RatingDTO ratingDTO);
 
-    Result<List<RatingDTO>> page(PageInfo pageInfo);
-
-    Long getTotal();
-
     Result<RatingDTO> showById(Long id);
+
+    Result<PageResult<RatingDTO>> search(PageInfo pageInfo);
 }

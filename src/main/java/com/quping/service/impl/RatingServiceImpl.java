@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.quping.common.Constants;
 import com.quping.common.PageInfo;
+import com.quping.common.PageResult;
 import com.quping.common.Result;
 import com.quping.dao.mapper.UserRatingMapper;
 import com.quping.dto.RatingDTO;
@@ -152,26 +153,6 @@ public class RatingServiceImpl implements RatingService {
         rating.setCount(0);
         return ratingMapper.insert(rating) > 0 ? Result.ok():Result.fail();
     }
-
-    @Override
-    public Result<List<RatingDTO>> page(PageInfo pageInfo) {
-        Page<Rating> page = new Page<>(pageInfo.getPageNumber(),pageInfo.getPageSize());
-        List<RatingDTO> ratingDTOList = ratingMapper
-                .selectPage(page,null)
-                .getRecords()
-                .stream().map(e -> {
-            RatingDTO ratingDTO = new RatingDTO();
-            BeanUtil.copyProperties(e, ratingDTO);
-            return ratingDTO;
-        }).collect(Collectors.toList());
-        return Result.page(ratingDTOList,pageInfo);
-    }
-
-    @Override
-    public Long getTotal() {
-        return ratingMapper.selectCount(null);
-    }
-
     /**
      * 根据id获取评分详情，以及当前用户的评分
      * 走缓存路线
@@ -195,5 +176,28 @@ public class RatingServiceImpl implements RatingService {
             }
         }
         return Result.ok(ratingDTO);
+    }
+
+    @Override
+    public Result<PageResult<RatingDTO>> search(PageInfo pageInfo) {
+        Page<Rating> page = new Page<>(pageInfo.getPageNumber(),pageInfo.getPageSize());
+        QueryWrapper<Rating> wrapper = new QueryWrapper<>();
+        wrapper.like("title",pageInfo.getCondition());
+        Long total = ratingMapper.selectCount(wrapper);
+        PageResult<RatingDTO> pageResult = new PageResult<>();
+        if(total > 0){
+            pageResult.setTotal(total);
+            List<RatingDTO> ratingDTOList = ratingMapper.selectPage(page, wrapper)
+                    .getRecords()
+                    .stream()
+                    .map(e -> {
+                        RatingDTO ratingDTO = new RatingDTO();
+                        BeanUtil.copyProperties(e, ratingDTO);
+                        return ratingDTO;
+                    })
+                    .collect(Collectors.toList());
+            pageResult.setDataList(ratingDTOList);
+        }
+        return Result.ok(pageResult);
     }
 }
