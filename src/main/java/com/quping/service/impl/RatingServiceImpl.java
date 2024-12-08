@@ -18,11 +18,14 @@ import com.quping.service.FileService;
 import com.quping.service.RatingService;
 import com.quping.utils.RedisUtil;
 import com.quping.utils.UserHolder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -31,11 +34,13 @@ import java.util.stream.Collectors;
  * @date: 2024/9/10 21:34
  */
 @Service
+@Slf4j
 public class RatingServiceImpl implements RatingService {
     private final RatingMapper ratingMapper;
     private final UserRatingMapper userRatingMapper;
     private final StringRedisTemplate stringRedisTemplate;
     private final FileService fileService;
+    private static final AtomicInteger atomicInteger = new AtomicInteger(0);
     @Autowired
     RatingServiceImpl(RatingMapper ratingMapper,
                       UserRatingMapper userRatingMapper,
@@ -67,7 +72,7 @@ public class RatingServiceImpl implements RatingService {
     @Override
     public Rating getById(long id) {
         String key = Constants.RATING_CACHE_PREFIX + id;
-        return RedisUtil.getFromCacheById(key, (long) id,Rating.class,ratingMapper);
+        return RedisUtil.getFromCacheById(key, id,Rating.class,ratingMapper);
     }
 
     /**
@@ -76,50 +81,41 @@ public class RatingServiceImpl implements RatingService {
      * @return
      */
     @Override
-    public synchronized Result<Void> doRating(UserRatingMappingDTO urmd) {
-        User user = UserHolder.getUserSession();
-        if(user == null) return Result.failWithMsg("请登录");
-        urmd.setUserId(user.getId());
-        Rating rating = getById(urmd.getRatingId());
-        if(rating == null) return Result.failWithMsg("数据不存在");
-        UserRatingMapping entity = userRatingMapper.selectOne(new QueryWrapper<UserRatingMapping>()
-                .eq("user_id",urmd.getUserId())
-                .eq("rating_id",urmd.getRatingId()));
-        int res = 0;
-        if(entity == null){
-            //新增用户评分
-            entity = new UserRatingMapping();
-            BeanUtil.copyProperties(urmd,entity);
-            userRatingMapper.insert(entity);
-            /*
-             * talScore/count = oldScore => talScore = oldScore*count
-             * newScore = (talScore+newUScore)/(count+1) => (oldScore*count+newUScore)/(count+1)
-             */
-            float oldScore = rating.getScore();
-            float count = rating.getCount();
-            float newUScore = urmd.getScore();
-            float newScore = (oldScore*count+newUScore)/(count+1);
-            rating.setScore(newScore);
-            rating.setCount(rating.getCount()+1);
-        }else{
-            //用户修改评分
-            /*
-             * talScore/count = oldScore => talScore = oldScore*count
-             * newScore = (talScore - oldUScore + newUScore)/count =>
-             * newScore = (oldScore*count - oldUScore + newUScore)/count
-             */
-            float oldScore = rating.getScore();
-            float count = rating.getCount();
-            float oldUScore = entity.getScore();
-            float newUScore = urmd.getScore();
-            float newScore = (oldScore*count-oldUScore+newUScore)/count;
-            rating.setScore(newScore);
-            entity.setScore(urmd.getScore());
-            userRatingMapper.updateById(entity);
+    public Result<Void> doRating(UserRatingMappingDTO urmd) {
+        synchronized (RatingServiceImpl.class){
+            int i = atomicInteger.incrementAndGet();
+            log.info("第{}个请求",i);
+            User user = UserHolder.getUserSession();
+            if(user == null) return Result.failWithMsg("请登录");
+            urmd.setUserId(user.getId());
+            Rating rating = ratingMapper.selectById(urmd.getRatingId());
+            if(rating == null) return Result.failWithMsg("数据不存在");
+            UserRatingMapping entity = userRatingMapper.selectOne(new QueryWrapper<UserRatingMapping>()
+                    .eq("user_id",urmd.getUserId())
+                    .eq("rating_id",urmd.getRatingId()));
+            int res = 1;
+            if(entity == null){
+                //新增用户评分
+                entity = new UserRatingMapping();
+                BeanUtil.copyProperties(urmd,entity);
+                res &= userRatingMapper.insert(entity);
+                rating.setTotalScore(rating.getTotalScore()+entity.getScore());
+                rating.setCount(rating.getCount()+1);
+                log.info("新增用户评分count:{}",rating.getCount());
+            }else{
+                log.info("修改用户评分");
+                //用户修改评分
+                rating.setTotalScore(rating.getTotalScore() - entity.getScore() + urmd.getScore());
+                entity.setScore(urmd.getScore());
+                res &= userRatingMapper.updateById(entity);
+            }
+            res &= ratingMapper.updateById(rating);//先更新数据库后删除缓存
+            stringRedisTemplate.delete(Constants.RATING_CACHE_PREFIX+rating.getId());
+            if(res == 0){
+                log.info("评分失败");
+            }
+            return res>0?Result.ok():Result.fail();
         }
-        res = ratingMapper.updateById(rating);//先更新数据库后删除缓存
-        stringRedisTemplate.delete(Constants.RATING_CACHE_PREFIX+rating.getId());
-        return res>0?Result.ok():Result.fail();
     }
 
     /**
@@ -149,7 +145,7 @@ public class RatingServiceImpl implements RatingService {
         User user = UserHolder.getUserSession();
         rating.setCreateBy(user.getId());
         rating.setImageUrl(fileService.upload(ratingDTO.getImage()));
-        rating.setScore(0f);
+        rating.setTotalScore(0);
         rating.setCount(0);
         return ratingMapper.insert(rating) > 0 ? Result.ok():Result.fail();
     }

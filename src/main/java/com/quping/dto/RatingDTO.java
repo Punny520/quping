@@ -23,10 +23,6 @@ public class RatingDTO {
      */
     private String imageUrl;
     /**
-     * 评分
-     */
-    private Float score;
-    /**
      * 标题
      */
     private String title;
@@ -47,7 +43,10 @@ public class RatingDTO {
      * 创建人
      */
     private Long createBy;
-
+    /**
+     * 总评分
+     */
+    private Integer totalScore;
     /**
      * 图片文件
      */

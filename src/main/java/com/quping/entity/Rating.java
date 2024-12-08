@@ -26,10 +26,6 @@ public class Rating {
      */
     private String imageUrl;
     /**
-     * 评分
-     */
-    private Float score;
-    /**
      * 标题
      */
     private String title;
@@ -46,6 +42,10 @@ public class Rating {
      * 创建人
      */
     private Long createBy;
+    /**
+     * 总评分
+     */
+    private Integer totalScore;
 
     /**
      * 公共字段
