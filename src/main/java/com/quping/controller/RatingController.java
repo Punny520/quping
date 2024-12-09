@@ -59,6 +59,8 @@ public class RatingController {
 
     /**
      * 用户评分
+     * 使用新方案
+     * 测试提交
      * @param urmd
      * @return
      */
