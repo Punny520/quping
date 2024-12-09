@@ -40,7 +40,6 @@ public class RatingServiceImpl implements RatingService {
     private final UserRatingMapper userRatingMapper;
     private final StringRedisTemplate stringRedisTemplate;
     private final FileService fileService;
-    private static final AtomicInteger atomicInteger = new AtomicInteger(0);
     @Autowired
     RatingServiceImpl(RatingMapper ratingMapper,
                       UserRatingMapper userRatingMapper,
@@ -83,8 +82,6 @@ public class RatingServiceImpl implements RatingService {
     @Override
     public Result<Void> doRating(UserRatingMappingDTO urmd) {
         synchronized (RatingServiceImpl.class){
-            int i = atomicInteger.incrementAndGet();
-            log.info("第{}个请求",i);
             User user = UserHolder.getUserSession();
             if(user == null) return Result.failWithMsg("请登录");
             urmd.setUserId(user.getId());
