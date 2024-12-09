@@ -76,6 +76,15 @@ public class RatingServiceImpl implements RatingService {
 
     /**
      * 用户评分
+     * 单机情况：
+     * 通过乐观锁更新UserRatingMapping
+     * 如果更新成功，修改redis中的评分信息
+     * 更新失败，返回"你点的太快了"
+     * 在redis中检查评分的标志位，如果为1则直接返回
+     * 如果为0或者没有则设置为1,发布一个延迟一秒后发布的事件
+     * 监听器收到事件后，将标志位设置为0，并且从redis中获取评分数据保存到数据库中
+     * 分布式、微服务情况：
+     *
      * @param urmd
      * @return
      */
