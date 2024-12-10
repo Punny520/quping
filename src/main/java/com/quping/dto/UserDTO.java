@@ -18,6 +18,10 @@ public class UserDTO {
      */
     private Long id;
     /**
+     * 头像url
+     */
+    private String avatarUrl;
+    /**
      * 昵称
      */
     private String nickName;

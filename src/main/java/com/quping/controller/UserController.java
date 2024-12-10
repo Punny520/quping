@@ -4,8 +4,10 @@ import com.quping.common.Result;
 import com.quping.dto.UserDTO;
 import com.quping.entity.User;
 import com.quping.service.UserService;
+import com.quping.utils.UserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @description: UserController
@@ -87,5 +89,9 @@ public class UserController {
     @PostMapping("/firstSetting")
     public Result<?> firstSetting(@RequestBody UserDTO userDTO){
         return userService.firstSetting(userDTO);
+    }
+    @PostMapping("/uploadAvatar")
+    public Result<String> uploadAvatar(@RequestParam("file") MultipartFile file){
+        return userService.uploadAvatar(file);
     }
 }

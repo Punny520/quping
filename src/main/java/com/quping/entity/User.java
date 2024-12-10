@@ -22,6 +22,10 @@ public class User {
     @TableId(type = IdType.AUTO)
     private Long id;
     /**
+     * 头像url
+     */
+    private String avatarUrl;
+    /**
      * 昵称
      */
     private String nickName;

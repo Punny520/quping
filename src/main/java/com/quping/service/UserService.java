@@ -4,6 +4,7 @@ package com.quping.service;
 import com.quping.common.Result;
 import com.quping.dto.UserDTO;
 import com.quping.entity.User;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
 
@@ -22,4 +23,6 @@ public interface UserService {
     Result<Boolean> checkIfFirstLogin();
 
     Result<?> firstSetting(UserDTO userDTO);
+
+    Result<String> uploadAvatar(MultipartFile file);
 }

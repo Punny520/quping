@@ -12,6 +12,7 @@ import com.quping.common.Result;
 import com.quping.dto.UserDTO;
 import com.quping.entity.User;
 import com.quping.dao.mapper.UserMapper;
+import com.quping.service.FileService;
 import com.quping.service.MailService;
 import com.quping.service.UserService;
 import com.quping.utils.UserHolder;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.concurrent.TimeUnit;
 
@@ -30,12 +32,20 @@ import java.util.concurrent.TimeUnit;
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService {
+    private final StringRedisTemplate redisTemplate;
+    private final UserMapper userMapper;
+    private final MailService mailService;
+    private final FileService fileService;
     @Autowired
-    StringRedisTemplate redisTemplate;
-    @Autowired
-    UserMapper userMapper;
-    @Autowired
-    MailService mailService;
+    public UserServiceImpl(StringRedisTemplate redisTemplate,
+                           UserMapper userMapper,
+                           MailService mailService,
+                           FileService fileService) {
+        this.redisTemplate = redisTemplate;
+        this.userMapper = userMapper;
+        this.mailService = mailService;
+        this.fileService = fileService;
+    }
 
     /**
      * 用户验登录
@@ -224,6 +234,17 @@ public class UserServiceImpl implements UserService {
         entity.setPassword(userDTO.getPassword());
         userMapper.updateById(entity);
         UserHolder.updateById(entity.getId());
+        return Result.ok();
+    }
+
+    @Override
+    public Result<String> uploadAvatar(MultipartFile file) {
+        User user = UserHolder.getUserSession();
+        if(user == null) return Result.failWithMsg("请登录");
+        User updateUser = new User();
+        updateUser.setId(user.getId());
+        updateUser.setAvatarUrl(fileService.upload(file));
+        userMapper.updateById(updateUser);
         return Result.ok();
     }
 
