@@ -103,7 +103,21 @@ public class UserServiceImpl implements UserService {
         token = UUID.randomUUID().toString(true);
         String userSession = JSONUtil.toJsonPrettyStr(user);
         redisTemplate.opsForValue().set(idTokenKey,token,1,TimeUnit.DAYS);
+        String value = redisTemplate.opsForValue().get(idTokenKey);
+        if(value!=null&&value.equals(token)){
+            log.info("插入token成功");
+        }else{
+            log.info("插token入失败");
+            throw new RuntimeException();
+        }
         redisTemplate.opsForValue().set( Constants.USER_SESSION_PREFIX + token,userSession,1,TimeUnit.DAYS);
+        String session = redisTemplate.opsForValue().get(Constants.USER_SESSION_PREFIX + token);
+        if(session!=null&&session.equals(userSession)){
+            log.info("插入session成功");
+        }else{
+            log.info("插入session失败");
+            throw new RuntimeException();
+        }
         return token;
     }
 

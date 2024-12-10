@@ -1,7 +1,9 @@
 package com.quping.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.quping.common.Constants;
 import com.quping.common.PageInfo;
@@ -14,6 +16,7 @@ import com.quping.entity.Rating;
 import com.quping.dao.mapper.RatingMapper;
 import com.quping.entity.User;
 import com.quping.entity.UserRatingMapping;
+import com.quping.event.publisher.RatingEventPublisher;
 import com.quping.service.FileService;
 import com.quping.service.RatingService;
 import com.quping.utils.RedisUtil;
@@ -40,15 +43,18 @@ public class RatingServiceImpl implements RatingService {
     private final UserRatingMapper userRatingMapper;
     private final StringRedisTemplate stringRedisTemplate;
     private final FileService fileService;
+    private final RatingEventPublisher ratingEventPublisher;
     @Autowired
     RatingServiceImpl(RatingMapper ratingMapper,
                       UserRatingMapper userRatingMapper,
                       StringRedisTemplate stringRedisTemplate,
-                      FileService fileService){
+                      FileService fileService,
+                      RatingEventPublisher ratingEventPublisher){
         this.ratingMapper = ratingMapper;
         this.userRatingMapper = userRatingMapper;
         this.stringRedisTemplate =stringRedisTemplate;
         this.fileService = fileService;
+        this.ratingEventPublisher = ratingEventPublisher;
     }
     /**
      * 插入新评分
@@ -90,38 +96,70 @@ public class RatingServiceImpl implements RatingService {
      */
     @Override
     public Result<Void> doRating(UserRatingMappingDTO urmd) {
-        synchronized (RatingServiceImpl.class){
-            User user = UserHolder.getUserSession();
-            if(user == null) return Result.failWithMsg("请登录");
-            urmd.setUserId(user.getId());
-            Rating rating = ratingMapper.selectById(urmd.getRatingId());
-            if(rating == null) return Result.failWithMsg("数据不存在");
-            UserRatingMapping entity = userRatingMapper.selectOne(new QueryWrapper<UserRatingMapping>()
-                    .eq("user_id",urmd.getUserId())
-                    .eq("rating_id",urmd.getRatingId()));
-            int res = 1;
-            if(entity == null){
-                //新增用户评分
-                entity = new UserRatingMapping();
-                BeanUtil.copyProperties(urmd,entity);
-                res &= userRatingMapper.insert(entity);
-                rating.setTotalScore(rating.getTotalScore()+entity.getScore());
-                rating.setCount(rating.getCount()+1);
-                log.info("新增用户评分count:{}",rating.getCount());
-            }else{
-                log.info("修改用户评分");
-                //用户修改评分
-                rating.setTotalScore(rating.getTotalScore() - entity.getScore() + urmd.getScore());
-                entity.setScore(urmd.getScore());
-                res &= userRatingMapper.updateById(entity);
-            }
-            res &= ratingMapper.updateById(rating);//先更新数据库后删除缓存
-            stringRedisTemplate.delete(Constants.RATING_CACHE_PREFIX+rating.getId());
-            if(res == 0){
-                log.info("评分失败");
-            }
-            return res>0?Result.ok():Result.fail();
+        User user = UserHolder.getUserSession();
+        if(user == null){
+            return Result.failWithMsg("请登录后重试");
         }
+        urmd.setUserId(user.getId());
+        UserRatingMapping urm = userRatingMapper.selectOne(new QueryWrapper<UserRatingMapping>()
+                .eq("user_Id", urmd.getUserId())
+                .eq("rating_Id", urmd.getRatingId()));
+        if(urm == null){
+            urm = new UserRatingMapping();
+            urm.setRatingId(urmd.getRatingId());
+            urm.setUserId(urmd.getUserId());
+            urm.setScore(urmd.getScore());
+            try{
+                userRatingMapper.insert(urm);
+                getAndSet(urm,urmd, false);
+            }catch (Exception e){
+                log.error(e.getMessage());
+                return Result.failWithMsg("你点的太快了");
+            }
+        }else {
+            //乐观锁更新
+            Integer oldScore = urm.getScore();
+            urm.setScore(urmd.getScore());
+            UserRatingMapping queryEntity = new UserRatingMapping();
+            queryEntity.setScore(urm.getScore());
+            int result = userRatingMapper
+                    .update(queryEntity,new UpdateWrapper<UserRatingMapping>()
+                            .eq("user_Id", urmd.getUserId())
+                            .eq("rating_Id", urmd.getRatingId()));
+            if(result == 0){
+                return Result.failWithMsg("你点的太快了");
+            }
+            urm.setScore(oldScore);
+            getAndSet(urm, urmd,true);
+        }
+        String key = Constants.RATING_STATUS + urmd.getRatingId();
+        String status = stringRedisTemplate
+                .opsForValue()
+                .get(key);
+        if(status != null && status.equals("1")){
+            return Result.ok();
+        }
+        stringRedisTemplate
+                .opsForValue()
+                .set(key,"1");
+        ratingEventPublisher.publishEventWithDelay(urmd.getRatingId());
+        return Result.ok();
+    }
+
+    /**
+     * 从缓存中获取并修改
+     * @param method false insert,true update
+     */
+    private synchronized void getAndSet(UserRatingMapping urm,UserRatingMappingDTO urmd,boolean method){
+        Rating entity = getById(urm.getRatingId());
+        if(!method){
+            entity.setTotalScore(entity.getTotalScore() + urm.getScore());
+            entity.setCount(entity.getCount() + 1);
+        }else{
+            entity.setTotalScore(entity.getTotalScore() - urm.getScore() + urmd.getScore());
+        }
+        String key = Constants.RATING_CACHE_PREFIX + urmd.getRatingId();
+        stringRedisTemplate.opsForValue().set(key, JSONUtil.toJsonPrettyStr(entity));
     }
 
     /**
