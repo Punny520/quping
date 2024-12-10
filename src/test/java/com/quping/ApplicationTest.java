@@ -2,7 +2,7 @@ package com.quping;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.quping.dao.mapper.CommentMapper;
-import com.quping.entry.Comment;
+import com.quping.entity.Comment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ public class ApplicationTest {
     @Test
     void testDelete(){
         Comment comment = new Comment();
-        comment.setId(1);
+        comment.setId(1L);
         commentMapper.deleteById(comment);
     }
 }
