@@ -24,4 +24,6 @@ public final class Constants {
      * 记录用户登入的集合
      */
     public static final String USER_LOGIN_TOKEN = "quping:token:";
+
+    public static final String RATING_STATUS = "quping:status:";
 }
