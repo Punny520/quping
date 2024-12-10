@@ -87,7 +87,7 @@ public class UserServiceImpl implements UserService {
      * @param user
      * @return
      */
-    public String getUserToken(User user){
+    private String getUserToken(User user){
         String token;
         String idTokenKey = Constants.USER_LOGIN_TOKEN+user.getId();
         Boolean keyExists = redisTemplate.hasKey(idTokenKey);
@@ -224,9 +224,4 @@ public class UserServiceImpl implements UserService {
         String loginKey = Constants.VERIFICATION_CODE_PREFIX + key;
         return redisTemplate.opsForValue().setIfAbsent(loginKey,code,time, unit);
     }
-
-//    private User createDefaultNewUser(){
-//        User user = new User();
-//
-//    }
 }
