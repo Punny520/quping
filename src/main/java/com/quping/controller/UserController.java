@@ -94,4 +94,9 @@ public class UserController {
     public Result<String> uploadAvatar(@RequestParam("file") MultipartFile file){
         return userService.uploadAvatar(file);
     }
+    @PostMapping("/update")
+    public Result<?> updateUser(@ModelAttribute UserDTO userDTO){
+        return userService.update(userDTO);
+    }
+
 }

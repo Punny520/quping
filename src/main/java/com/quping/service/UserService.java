@@ -25,4 +25,6 @@ public interface UserService {
     Result<?> firstSetting(UserDTO userDTO);
 
     Result<String> uploadAvatar(MultipartFile file);
+
+    Result<?> update(UserDTO userDTO);
 }

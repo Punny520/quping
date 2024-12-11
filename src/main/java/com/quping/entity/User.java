@@ -26,6 +26,10 @@ public class User {
      */
     private String avatarUrl;
     /**
+     * 主页描述消息
+     */
+    private String description;
+    /**
      * 昵称
      */
     private String nickName;

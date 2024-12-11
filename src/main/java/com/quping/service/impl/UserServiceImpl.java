@@ -15,6 +15,7 @@ import com.quping.dao.mapper.UserMapper;
 import com.quping.service.FileService;
 import com.quping.service.MailService;
 import com.quping.service.UserService;
+import com.quping.utils.RedisUtil;
 import com.quping.utils.UserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -245,6 +246,24 @@ public class UserServiceImpl implements UserService {
         updateUser.setId(user.getId());
         updateUser.setAvatarUrl(fileService.upload(file));
         userMapper.updateById(updateUser);
+        return Result.ok();
+    }
+
+    /**
+     * 用户更新信息
+     * @param userDTO
+     * @return
+     */
+    @Override
+    public Result<?> update(UserDTO userDTO) {
+        if(userDTO.getAvatarFile()!=null){
+            userDTO.setAvatarUrl(fileService.upload(userDTO.getAvatarFile()));
+        }
+        User user = new User();
+        BeanUtil.copyProperties(userDTO,user);
+        user.setId(UserHolder.getUserSession().getId());
+        userMapper.updateById(user);
+        UserHolder.updateById(user.getId());
         return Result.ok();
     }
 

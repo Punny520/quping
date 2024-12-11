@@ -3,6 +3,7 @@ package com.quping.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @description: 用户数据传输类
@@ -21,6 +22,10 @@ public class UserDTO {
      * 头像url
      */
     private String avatarUrl;
+    /**
+     * 主页描述消息
+     */
+    private String description;
     /**
      * 昵称
      */
@@ -41,4 +46,8 @@ public class UserDTO {
      * 邮箱
      */
     private String email;
+    /**
+     * 头像文件
+     */
+    private MultipartFile avatarFile;
 }

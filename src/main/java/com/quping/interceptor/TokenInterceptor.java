@@ -28,6 +28,9 @@ public class TokenInterceptor implements HandlerInterceptor {
         User user = UserHolder.getUserSession();
         if(user != null) return true;
         String token = request.getHeader("Token");
+        if(StrUtil.isEmpty(token)){
+            token = request.getHeader("token");
+        }
         if (StrUtil.isBlank(token)){
             response.setStatus(401);
             return false;

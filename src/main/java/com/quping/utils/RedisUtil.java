@@ -75,4 +75,7 @@ public class RedisUtil {
         stringRedisTemplate.opsForValue().set(key,JSONUtil.toJsonPrettyStr(entity),1, TimeUnit.DAYS);
         return entity;
     }
+    public static void del(String key){
+        stringRedisTemplate.delete(key);
+    }
 }
