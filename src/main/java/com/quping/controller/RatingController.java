@@ -91,4 +91,15 @@ public class RatingController {
     public Result<PageResult<RatingDTO>> search(@RequestBody PageInfo pageInfo){
         return ratingService.search(pageInfo);
     }
+
+    /**
+     * 查看用户创建的评分
+     * 分页查询
+     * @param pageInfo
+     * @return
+     */
+    @GetMapping("/show/createByMe")
+    public Result<PageResult<RatingDTO>> showCreateByMe(@RequestBody PageInfo pageInfo){
+        return ratingService.showCreateByMe(pageInfo);
+    }
 }

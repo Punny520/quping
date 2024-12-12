@@ -1,5 +1,7 @@
 package com.quping.controller;
 
+import com.quping.common.PageInfo;
+import com.quping.common.PageResult;
 import com.quping.common.Result;
 import com.quping.dto.CommentDTO;
 import com.quping.service.CommentService;
@@ -48,4 +50,16 @@ public class CommentController {
     public Result<String> likeComment(@PathVariable Long commentId) {
         return commentService.likeComment(commentId);
     }
+
+    /**
+     * 评分下评论分页加载
+     * @param ratingId
+     * @return
+     */
+    @GetMapping("/list/page/{ratingId}")
+    public Result<PageResult<CommentDTO>> listByPage(@RequestBody PageInfo pageInfo,
+                                                     @PathVariable Long ratingId) {
+        return commentService.listPage(pageInfo,ratingId);
+    }
+
 }

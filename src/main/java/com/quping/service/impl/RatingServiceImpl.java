@@ -27,6 +27,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -223,21 +224,43 @@ public class RatingServiceImpl implements RatingService {
         Page<Rating> page = new Page<>(pageInfo.getPageNumber(),pageInfo.getPageSize());
         QueryWrapper<Rating> wrapper = new QueryWrapper<>();
         wrapper.like("title",pageInfo.getCondition());
-        Long total = ratingMapper.selectCount(wrapper);
         PageResult<RatingDTO> pageResult = new PageResult<>();
-        if(total > 0){
-            pageResult.setTotal(total);
-            List<RatingDTO> ratingDTOList = ratingMapper.selectPage(page, wrapper)
-                    .getRecords()
-                    .stream()
-                    .map(e -> {
-                        RatingDTO ratingDTO = new RatingDTO();
-                        BeanUtil.copyProperties(e, ratingDTO);
-                        return ratingDTO;
-                    })
-                    .collect(Collectors.toList());
-            pageResult.setDataList(ratingDTOList);
-        }
+        List<RatingDTO> ratingDTOList = ratingMapper.selectPage(page, wrapper)
+                .getRecords()
+                .stream()
+                .map(e -> {
+                    RatingDTO ratingDTO = new RatingDTO();
+                    BeanUtil.copyProperties(e, ratingDTO);
+                    return ratingDTO;
+                })
+                .collect(Collectors.toList());
+        pageResult.setTotal(page.getTotal());
+        pageResult.setDataList(ratingDTOList);
         return Result.ok(pageResult);
+    }
+
+    @Override
+    public Result<PageResult<RatingDTO>> showCreateByMe(PageInfo pageInfo) {
+        User user = UserHolder.getUserSession();
+        if(user == null) return Result.failWithMsg("请登录后再查看");
+        Page<Rating> page = new Page<>(pageInfo.getPageNumber(),pageInfo.getPageSize());
+        List<Rating> ratingList = ratingMapper
+                .selectPage(page, new QueryWrapper<Rating>()
+                        .eq("create_by", user.getId()))
+                .getRecords();
+        List<RatingDTO> ratingDTOList = ratingListToDtoList(ratingList);
+        PageResult<RatingDTO> pr = new PageResult<>();
+        pr.setTotal(page.getTotal());
+        pr.setDataList(ratingDTOList);
+        return Result.ok(pr);
+    }
+
+    private List<RatingDTO> ratingListToDtoList(List<Rating> ratingList) {
+        if(ratingList == null) return Collections.emptyList();
+        return ratingList.stream().map(e->{
+            RatingDTO dto = new RatingDTO();
+            BeanUtil.copyProperties(e,dto);
+            return dto;
+        }).collect(Collectors.toList());
     }
 }

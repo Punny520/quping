@@ -25,4 +25,6 @@ public interface RatingService {
     Result<RatingDTO> showById(Long id);
 
     Result<PageResult<RatingDTO>> search(PageInfo pageInfo);
+
+    Result<PageResult<RatingDTO>> showCreateByMe(PageInfo pageInfo);
 }

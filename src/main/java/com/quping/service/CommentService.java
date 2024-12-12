@@ -1,5 +1,7 @@
 package com.quping.service;
 
+import com.quping.common.PageInfo;
+import com.quping.common.PageResult;
 import com.quping.common.Result;
 import com.quping.dto.CommentDTO;
 
@@ -11,4 +13,6 @@ public interface CommentService {
     Result<List<CommentDTO>> listByRatingId(Long ratingId);
 
     Result<String> likeComment(Long commentId);
+
+    Result<PageResult<CommentDTO>> listPage(PageInfo pageInfo, Long ratingId);
 }

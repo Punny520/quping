@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
-* @author Canway
+* @author punny
 * @description 针对表【comment_like_info】的数据库操作Service实现
 * @createDate 2024-12-06 17:01:40
 */

@@ -2,6 +2,9 @@ package com.quping.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.quping.common.PageInfo;
+import com.quping.common.PageResult;
 import com.quping.common.Result;
 import com.quping.dao.mapper.CommentLikeInfoMapper;
 import com.quping.dao.mapper.CommentMapper;
@@ -78,6 +81,26 @@ public class CommentServiceImpl implements CommentService {
         commentMapper.updateById(comment);
         return Result.ok();
     }
+
+    @Override
+    public Result<PageResult<CommentDTO>> listPage(PageInfo pageInfo, Long ratingId) {
+        Page<Comment> page = new Page<>(pageInfo.getPageNumber(), pageInfo.getPageSize());
+        List<Comment> commentList = commentMapper
+                .selectPage(page, new QueryWrapper<Comment>()
+                        .eq("rating_id", ratingId))
+                .getRecords();
+        List<CommentDTO> commentDTOList = commentList
+                .stream()
+                .map(e -> {
+                    CommentDTO commentDTO = new CommentDTO();
+                    BeanUtil.copyProperties(e, commentDTO);
+                    commentDTO.setLiked(commentLikeInfoService.getStatus(commentDTO.getId()));
+                    return commentDTO;
+                }).collect(Collectors.toList());
+        PageResult<CommentDTO> pr = new PageResult<>(page.getTotal(), commentDTOList);
+        return Result.ok(pr);
+    }
+
     private void setLike(CommentLikeInfo likeInfo,Comment comment) {
         if(likeInfo.getStatus() == null) {
             likeInfo.setStatus(0);
