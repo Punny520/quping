@@ -11,7 +11,7 @@
  Target Server Version : 80040 (8.0.40)
  File Encoding         : 65001
 
- Date: 11/12/2024 17:53:23
+ Date: 12/12/2024 17:56:53
 */
 
 SET NAMES utf8mb4;
@@ -31,7 +31,7 @@ CREATE TABLE `comment`  (
   `update_time` timestamp NULL DEFAULT NULL,
   `deleted` tinyint(1) NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for comment_like_info
@@ -46,7 +46,23 @@ CREATE TABLE `comment_like_info`  (
   `update_time` timestamp NULL DEFAULT NULL,
   `deleted` tinyint(1) NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Table structure for post
+-- ----------------------------
+DROP TABLE IF EXISTS `post`;
+CREATE TABLE `post`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `text` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '文字内容',
+  `image_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '图片url',
+  `like_count` int NULL DEFAULT 0 COMMENT '点赞数',
+  `create_by` bigint NULL DEFAULT NULL COMMENT '创建人id',
+  `create_time` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` timestamp NULL DEFAULT NULL COMMENT '更新时间',
+  `deleted` tinyint(1) NULL DEFAULT 0 COMMENT '逻辑删除标记',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for rating
@@ -99,6 +115,6 @@ CREATE TABLE `user_rating_mapping`  (
   `deleted` tinyint(1) NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_rating_user`(`user_id` ASC, `rating_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 SET FOREIGN_KEY_CHECKS = 1;
